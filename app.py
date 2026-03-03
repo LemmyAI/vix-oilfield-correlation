@@ -14,6 +14,26 @@ DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', '
 with open(DATA_FILE) as f:
     DATA = json.load(f)
 
+# Calculate correlations
+def calc_corr(x_list, y_list):
+    """Calculate Pearson correlation for aligned non-null pairs"""
+    pairs = [(x, y) for x, y in zip(x_list, y_list) if x is not None and y is not None]
+    if len(pairs) < 3:
+        return 0
+    n = len(pairs)
+    sum_x = sum(p[0] for p in pairs)
+    sum_y = sum(p[1] for p in pairs)
+    sum_xy = sum(p[0] * p[1] for p in pairs)
+    sum_x2 = sum(p[0] ** 2 for p in pairs)
+    sum_y2 = sum(p[1] ** 2 for p in pairs)
+    num = n * sum_xy - sum_x * sum_y
+    den = ((n * sum_x2 - sum_x ** 2) * (n * sum_y2 - sum_y ** 2)) ** 0.5
+    return num / den if den != 0 else 0
+
+corr_vix_attacks = calc_corr(DATA['vix'], DATA['attacks'])
+corr_djt_kia = calc_corr(DATA['djt'], DATA['kia'])
+corr_rrp_deaths = calc_corr(DATA['rrp'], DATA['deaths'])
+
 @app.route('/')
 def index():
     return f'''<!DOCTYPE html>
@@ -55,10 +75,15 @@ def index():
         .chart-explain {{ color: #aaa; font-size: 11px; margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; line-height: 1.5; }}
         canvas {{ max-height: 300px; }}
         
+        .sources {{ background: rgba(26, 26, 26, 0.6); border-radius: 8px; padding: 10px 15px; margin: 15px 0; border-left: 3px solid #555; }}
+        .sources-title {{ color: #888; font-size: 11px; font-weight: bold; margin-bottom: 5px; }}
+        .sources-list {{ color: #666; font-size: 10px; line-height: 1.6; }}
+        .sources-list a {{ color: #ffa502; }}
+        
         .section {{ background: rgba(26, 26, 26, 0.8); border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid #333; }}
         .section h3 {{ color: #ffa502; margin-top: 0; font-size: 14px; }}
         .timeline-item {{ margin-bottom: 10px; padding-left: 20px; position: relative; }}
-        .timeline-item::before {{ content: "⬤"; position: absolute; left: 0; font-size: 8px; }}
+        .timeline-item::before {{ content: "⚫"; position: absolute; left: 0; font-size: 8px; }}
         .timeline-date {{ font-size: 13px; font-weight: bold; }}
         
         .cynical {{ background: linear-gradient(135deg, #2a1a1a 0%, #1a1a2a 100%); border-radius: 10px; padding: 15px; margin: 15px 0; border-left: 3px solid #ff6b6b; }}
@@ -108,7 +133,7 @@ def index():
             </div>
             <div class="stat-box">
                 <div class="stat-label">Correlation</div>
-                <p class="stat-value" style="color: #00ff00;">r=0.74</p>
+                <p class="stat-value" style="color: #00ff00;">r={corr_vix_attacks:.2f}</p>
                 <div class="stat-sub">Fear follows fire</div>
             </div>
         </div>
@@ -131,7 +156,7 @@ def index():
             </div>
             <div class="stat-box">
                 <div class="stat-label">Correlation</div>
-                <p class="stat-value" style="color: #ffaa00;">r=0.89</p>
+                <p class="stat-value" style="color: #ffaa00;">r={corr_djt_kia:.2f}</p>
                 <div class="stat-sub">Morbid sync</div>
             </div>
         </div>
@@ -153,20 +178,35 @@ def index():
                 <div class="stat-sub">Peak crisis</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Drop %</div>
-                <p class="stat-value" style="color: #ff69b4;">42%</p>
-                <div class="stat-sub">Of reserves</div>
+                <div class="stat-label">Correlation</div>
+                <p class="stat-value" style="color: #ff69b4;">r={corr_rrp_deaths:.2f}</p>
+                <div class="stat-sub">Inverse sync</div>
             </div>
         </div>
         
         <div class="chart-container active" id="chart-vix">
             <h3 class="chart-title" style="color: #00d4ff;">📈 VIX Volatility vs Infrastructure Attacks</h3>
             <canvas id="vixCanvas"></canvas>
+            <div class="sources">
+                <div class="sources-title">📚 Data Sources</div>
+                <div class="sources-list">
+                    <strong>VIX:</strong> <a href="https://fred.stlouisfed.org/series/VIXCLS" target="_blank">FRED - VIXCLS</a> (CBOE Volatility Index) |
+                    <strong>Attacks:</strong> Reuters, AP News, Wikipedia conflict timeline |
+                    <strong>Oil:</strong> Strait of Hormuz closure reported by major outlets
+                </div>
+            </div>
         </div>
         
         <div class="chart-container" id="chart-maga">
             <h3 class="chart-title" style="color: #ff69b4;">🇺🇸 DJT Stock vs American Casualties</h3>
             <canvas id="magaCanvas"></canvas>
+            <div class="sources">
+                <div class="sources-title">📚 Data Sources</div>
+                <div class="sources-list">
+                    <strong>DJT Stock:</strong> Trump Media & Technology Group (NASDAQ: DJT) - Yahoo Finance, MarketWatch |
+                    <strong>US Casualties:</strong> US Department of Defense briefings, Reuters, AP News
+                </div>
+            </div>
         </div>
         
         <div class="chart-container" id="chart-rrp">
@@ -174,17 +214,23 @@ def index():
             <div class="chart-explain">
                 <strong>What is RRP?</strong> The Fed's Reverse Repo facility is where banks park excess cash overnight. 
                 When RRP drops <strong>${DATA['stats']['rrp_drop']:.0f} BILLION</strong> in days, that cash floods into markets - covert liquidity injection 
-                without official QE announcement. They call it "liquidity management." We call it <strong>Hidden QE</strong>. 
-                Note how it tanked when the war started.
+                without official QE announcement. They call it "liquidity management." We call it <strong>Hidden QE</strong>.
             </div>
             <canvas id="rrpCanvas"></canvas>
+            <div class="sources">
+                <div class="sources-title">📚 Data Sources</div>
+                <div class="sources-list">
+                    <strong>RRP Operations:</strong> <a href="https://www.newyorkfed.org/markets/omo_transaction_data#reverse-repo" target="_blank">NY Fed - Reverse Repo Operations</a> |
+                    <strong>Conflict Deaths:</strong> Iran Health Ministry, IDF Spokesperson, US Central Command, UN reports
+                </div>
+            </div>
         </div>
         
         <div class="cynical">
             <h4>🦾 Lemmy's Cynical Take</h4>
             <p>
-                VIX spikes, DJT pumps 93%, the Fed "magically" drains ${DATA['stats']['rrp_drop']:.0f}B from reverse repos 
-                during the same conflict. Markets feast on chaos while {DATA['stats']['total_deaths']:,} people died. 
+                VIX spikes, DJT pumps {DATA['stats']['djt_pump_pct']:.0f}%, the Fed drains ${DATA['stats']['rrp_drop']:.0f}B from reverse repos 
+                during the same conflict that killed {DATA['stats']['total_deaths']:,} people. 
                 Make of that what you will.
             </p>
         </div>
@@ -192,25 +238,25 @@ def index():
         <div class="section">
             <h3>📅 War Timeline (Feb 28 - Mar 3, 2026)</h3>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #ff0000;">⚔️ Feb 28</span>
+                <span class="timeline-date" style="color: #ff0000;">⚫ Feb 28</span>
                 <span style="color: #aaa;">War starts - Khamenei assassinated, missiles fly, RRP drain begins</span>
             </div>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #ff6600;">🛢️ Mar 1</span>
+                <span class="timeline-date" style="color: #ff6600;">⚫ Mar 1</span>
                 <span style="color: #aaa;">Hormuz CLOSED - DJT hits ${DATA['stats']['djt_max']:.2f}, RRP crashes to ${DATA['stats']['rrp_min']:.0f}B</span>
             </div>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #ffaa00;">🔥 Mar 2</span>
+                <span class="timeline-date" style="color: #ffaa00;">⚫ Mar 2</span>
                 <span style="color: #aaa;">Hezbollah joins - 1,544 total deaths</span>
             </div>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #00ffff;">📡 Mar 3</span>
+                <span class="timeline-date" style="color: #00ffff;">⚫ Mar 3</span>
                 <span style="color: #aaa;">Qatar strikes back - {DATA['stats']['total_deaths']:,} dead total</span>
             </div>
         </div>
         
         <div class="footer">
-            Data: FRED, Market Data, Official Reports | <a href="https://github.com/LemmyAI/vix-oilfield-correlation">GitHub</a><br>
+            Data compiled from public sources | <a href="https://github.com/LemmyAI/vix-oilfield-correlation">GitHub</a><br>
             Updated: {DATA['stats']['last_updated']} | 🦾 Powered by cynicism and charts
         </div>
     </div>
