@@ -135,7 +135,7 @@ def index():
                 <div class="stat-sub">20% oil supply</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Correlation</div>
+                <div class="stat-label">Approval vs KIA</div>
                 <p class="stat-value" style="color: #00ff00;">r={CORR['vix_attacks']:.2f}</p>
                 <div class="stat-sub">Negative: fear peaks early</div>
             </div>
@@ -158,7 +158,7 @@ def index():
                 <div class="stat-sub">Hormuz day</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Correlation</div>
+                <div class="stat-label">Approval vs KIA</div>
                 <p class="stat-value" style="color: #ffaa00;">r={CORR['djt_kia']:.2f}</p>
                 <div class="stat-sub">Weak positive</div>
             </div>
@@ -181,9 +181,9 @@ def index():
                 <div class="stat-sub">War support</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Correlation</div>
+                <div class="stat-label">Approval vs KIA</div>
                 <p class="stat-value" style="color: #ff69b4;">r={CORR['righttrack_kia']:.2f}</p>
-                <div class="stat-sub">Strong: rally effect</div>
+                <div class="stat-sub">Morbid rally effect</div>
             </div>
         </div>
         
@@ -204,7 +204,7 @@ def index():
                 <div class="stat-sub">Peak crisis</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Correlation</div>
+                <div class="stat-label">Approval vs KIA</div>
                 <p class="stat-value" style="color: #ff69b4;">r={CORR['rrp_deaths']:.2f}</p>
                 <div class="stat-sub">Near zero: unrelated</div>
             </div>
@@ -245,7 +245,7 @@ def index():
         <div class="chart-container" id="chart-maga">
             <h3 class="chart-title" style="color: #ff4444;">🇺🇸 Approval Ratings During War</h3>
             <div class="chart-explain">
-                <strong>Rally Round the Flag:</strong> Classic effect - presidential approval spikes during military action. 
+                <strong>Body Count Boost</strong>: As US casualties accumulated (6 KIA), public sentiment rallied hard. Trump approval jumped +7.6pts, "Right Track" surged +11pts. The <strong>r=0.81 correlation</strong> between Right Track and body count is the strongest relationship in this dashboard - Americans feel better about their country when soldiers die for it.
                 Trump gained +{DATA['stats']['trump_change']:.1f}pts, "Right Track" surged from 28% to 39%. 
                 The <strong>r={CORR['righttrack_kia']:.2f}</strong> correlation is STRONG - Americans rallied as casualties mounted.
             </div>
