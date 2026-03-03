@@ -91,7 +91,6 @@ def index():
         .cynical p {{ color: #aaa; font-size: 12px; margin: 0; line-height: 1.6; }}
         
         .footer {{ text-align: center; color: #555; font-size: 11px; margin-top: 20px; padding: 15px; border-top: 1px solid #222; }}
-        .footer a {{ color: #ffa502; }}
     </style>
 </head>
 <body>
@@ -246,7 +245,7 @@ def index():
                 <span style="color: #aaa;">Hormuz CLOSED - DJT hits ${DATA['stats']['djt_max']:.2f}, RRP crashes to ${DATA['stats']['rrp_min']:.0f}B</span>
             </div>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #ffaa00;">mar 2</span>
+                <span class="timeline-date" style="color: #ffaa00;">Mar 2</span>
                 <span style="color: #aaa;">Hezbollah joins - 1,544 total deaths</span>
             </div>
             <div class="timeline-item">
@@ -256,8 +255,7 @@ def index():
         </div>
         
         <div class="footer">
-            Data compiled from public sources | <a href="https://github.com/LemmyAI/vix-oilfield-correlation">GitHub</a><br>
-            Updated: {DATA['stats']['last_updated']} | 🦾 Powered by cynicism and charts
+            Data compiled from public sources | Updated: {DATA['stats']['last_updated']} | 🦾 Powered by cynicism and charts
         </div>
     </div>
     
