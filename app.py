@@ -135,7 +135,7 @@ def index():
                 <div class="stat-sub">20% oil supply</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Approval vs KIA</div>
+                <div class="stat-label">VIX vs Energy</div>
                 <p class="stat-value" style="color: #00ff00;">r={CORR['vix_attacks']:.2f}</p>
                 <div class="stat-sub">Negative: fear peaks early</div>
             </div>
@@ -158,7 +158,7 @@ def index():
                 <div class="stat-sub">Hormuz day</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Approval vs KIA</div>
+                <div class="stat-label">DJT vs KIA</div>
                 <p class="stat-value" style="color: #ffaa00;">r={CORR['djt_kia']:.2f}</p>
                 <div class="stat-sub">Weak positive</div>
             </div>
@@ -204,7 +204,7 @@ def index():
                 <div class="stat-sub">Peak crisis</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Approval vs KIA</div>
+                <div class="stat-label">RRP vs Deaths</div>
                 <p class="stat-value" style="color: #ff69b4;">r={CORR['rrp_deaths']:.2f}</p>
                 <div class="stat-sub">Near zero: unrelated</div>
             </div>
