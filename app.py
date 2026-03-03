@@ -125,9 +125,9 @@ def index():
                 <div class="stat-sub">Fear index max</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Infra Attacks</div>
+                <div class="stat-label">Energy Infra</div>
                 <p class="stat-value" style="color: #ffa500;">{DATA['stats']['total_attacks']}</p>
-                <div class="stat-sub">Things destroyed</div>
+                <div class="stat-sub">Oil, gas, refineries</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Hormuz</div>
@@ -211,9 +211,9 @@ def index():
         </div>
         
         <div class="chart-container active" id="chart-vix">
-            <h3 class="chart-title" style="color: #00d4ff;">📈 VIX Volatility vs Infrastructure Attacks</h3>
+            <h3 class="chart-title" style="color: #00d4ff;">📈 VIX Volatility vs Energy Infrastructure Attacks</h3>
             <div class="chart-explain">
-                <strong>Fear vs Fire:</strong> VIX spiked to 23.12 when Hormuz closed (Mar 1), then declined while attacks accumulated. 
+                <strong>Fear vs Fire</strong> Energy infrastructure includes oil fields, refineries, pipelines, export terminals. VIX spiked to 23.12 when Hormuz closed (Mar 1), then declined while attacks accumulated. 
                 The <strong>r={CORR['vix_attacks']:.2f}</strong> correlation is negative because fear peaked early, then markets adapted to the "new normal" of daily strikes.
             </div>
             <canvas id="vixCanvas"></canvas>
