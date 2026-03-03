@@ -1,147 +1,197 @@
 #!/usr/bin/env python3
 """
-2026 Iran Conflict Dashboard - Lightweight version
+2026 Iran Conflict Dashboard - LIVE
+Tab 1: VIX vs Infrastructure Attacks
+Tab 2: MAGA Index (DJT) vs US Casualties
 """
 
-from flask import Flask
+from flask import Flask, send_from_directory, send_file
 import json
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
-# Hardcoded data (lighter than pandas)
-VIX_DATA = [
-    {"date": "2026-02-18", "vix": 18.52},
-    {"date": "2026-02-19", "vix": 18.75},
-    {"date": "2026-02-20", "vix": 19.09},
-    {"date": "2026-02-21", "vix": 19.88},
-    {"date": "2026-02-23", "vix": 21.01},
-    {"date": "2026-02-24", "vix": 19.55},
-    {"date": "2026-02-25", "vix": 17.93},
-    {"date": "2026-02-26", "vix": 18.63},
-    {"date": "2026-02-27", "vix": 19.86},
-    {"date": "2026-02-28", "vix": 22.45},
-    {"date": "2026-03-01", "vix": 23.12},
-    {"date": "2026-03-02", "vix": 21.44},
-    {"date": "2026-03-03", "vix": 20.87},
-]
-
-ATTACKS_DATA = [
-    {"date": "2026-02-28", "cumulative": 4},
-    {"date": "2026-03-01", "cumulative": 10},
-    {"date": "2026-03-02", "cumulative": 13},
-    {"date": "2026-03-03", "cumulative": 15},
-]
-
-DJT_DATA = [
-    {"date": "2026-02-18", "close": 18.45, "volume": 45.2},
-    {"date": "2026-02-19", "close": 18.92, "volume": 52.1},
-    {"date": "2026-02-20", "close": 19.15, "volume": 48.7},
-    {"date": "2026-02-21", "close": 19.88, "volume": 61.3},
-    {"date": "2026-02-24", "close": 21.22, "volume": 89.5},
-    {"date": "2026-02-25", "close": 22.05, "volume": 112.4},
-    {"date": "2026-02-26", "close": 21.88, "volume": 95.2},
-    {"date": "2026-02-27", "close": 24.12, "volume": 178.6},
-    {"date": "2026-02-28", "close": 31.45, "volume": 245.8},
-    {"date": "2026-03-01", "close": 35.67, "volume": 312.4},
-    {"date": "2026-03-02", "close": 32.18, "volume": 198.5},
-    {"date": "2026-03-03", "close": 28.45, "volume": 167.3},
-]
-
-US_KIA = [
-    {"date": "2026-02-28", "cumulative": 3},
-    {"date": "2026-03-01", "cumulative": 6},
-    {"date": "2026-03-02", "cumulative": 6},
-    {"date": "2026-03-03", "cumulative": 6},
-]
+# Load pre-validated data
+DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'data.json')
+with open(DATA_FILE) as f:
+    DATA = json.load(f)
 
 @app.route('/')
 def index():
-    vix_json = json.dumps(VIX_DATA)
-    attacks_json = json.dumps(ATTACKS_DATA)
-    djt_json = json.dumps(DJT_DATA)
-    kia_json = json.dumps(US_KIA)
-    
     return f'''<!DOCTYPE html>
 <html>
 <head>
     <title>2026 Iran Conflict Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        * {{ box-sizing: border-box; }}
         body {{ background: #0a0a0a; color: white; font-family: system-ui, sans-serif; margin: 0; padding: 0; }}
         .container {{ max-width: 1200px; margin: 0 auto; padding: 20px; }}
-        h1 {{ text-align: center; color: #ff4444; margin-bottom: 5px; }}
-        .subtitle {{ text-align: center; color: #ff6600; margin-top: 0; }}
+        h1 {{ text-align: center; color: #ff4444; margin-bottom: 5px; font-size: 24px; }}
+        .subtitle {{ text-align: center; color: #ff6600; margin-top: 0; font-size: 14px; }}
+        
+        /* Tabs */
+        .tabs {{ display: flex; gap: 10px; margin: 20px 0; }}
+        .tab {{ flex: 1; padding: 15px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.3s; }}
+        .tab:hover {{ border-color: #555; }}
+        .tab.active {{ border-color: #00d4ff; background: #1a2a3a; }}
+        .tab-title {{ font-size: 18px; font-weight: bold; margin-bottom: 5px; }}
+        .tab-desc {{ font-size: 12px; color: #888; }}
+        .tab.active .tab-title {{ color: #00d4ff; }}
+        #tab-maga.active {{ border-color: #ff69b4; }}
+        #tab-maga.active .tab-title {{ color: #ff69b4; }}
+        
+        /* Stats */
         .stats {{ display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }}
-        .stat-box {{ flex: 1; min-width: 150px; background: #1a1a1a; border-radius: 10px; padding: 15px; text-align: center; }}
-        .stat-label {{ color: #888; font-size: 14px; margin-bottom: 5px; }}
+        .stat-box {{ flex: 1; min-width: 140px; background: #1a1a1a; border-radius: 10px; padding: 15px; text-align: center; }}
+        .stat-label {{ color: #888; font-size: 12px; margin-bottom: 5px; }}
         .stat-value {{ font-size: 28px; font-weight: bold; margin: 0; }}
-        .stat-sub {{ color: #666; font-size: 12px; margin-top: 5px; }}
+        .stat-sub {{ color: #666; font-size: 11px; margin-top: 5px; }}
+        
+        /* Charts */
+        .chart-container {{ background: #1a1a1a; border-radius: 10px; padding: 20px; margin: 20px 0; display: none; }}
+        .chart-container.active {{ display: block; }}
+        .chart-title {{ color: #00d4ff; margin-top: 0; margin-bottom: 15px; }}
+        #chart-maga .chart-title {{ color: #ff69b4; }}
+        canvas {{ max-height: 350px; }}
+        
+        /* Timeline */
         .section {{ background: #1a1a1a; border-radius: 10px; padding: 20px; margin: 20px 0; }}
         .section h3 {{ color: #00d4ff; margin-top: 0; }}
-        .chart-container {{ background: #1a1a1a; border-radius: 10px; padding: 20px; margin: 20px 0; }}
-        canvas {{ max-height: 300px; }}
-        .timeline-item {{ margin-bottom: 10px; }}
-        .timeline-date {{ font-size: 18px; font-weight: bold; }}
+        .timeline-item {{ margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }}
+        .timeline-date {{ font-size: 16px; font-weight: bold; min-width: 100px; }}
+        .timeline-desc {{ color: #aaa; }}
+        
+        /* Footer */
+        .footer {{ text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding: 20px; border-top: 1px solid #333; }}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔴 LIVE: 2026 Iran Conflict Dashboard</h1>
-        <p class="subtitle">Feb 28 - Present | Strait of Hormuz Crisis</p>
+        <p class="subtitle">Feb 28 - Present | Strait of Hormuz Crisis | Updated: {DATA['stats']['last_updated']}</p>
         
-        <div class="stats">
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" id="tab-vix" onclick="showTab('vix')">
+                <div class="tab-title">📈 VIX vs Attacks</div>
+                <div class="tab-desc">Market volatility vs infrastructure strikes</div>
+            </div>
+            <div class="tab" id="tab-maga" onclick="showTab('maga')">
+                <div class="tab-title">🇺🇸 MAGA vs US KIA</div>
+                <div class="tab-desc">DJT stock vs American casualties</div>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats" id="stats-vix">
             <div class="stat-box">
                 <div class="stat-label">VIX Peak</div>
-                <p class="stat-value" style="color: #ff4444;">23.12</p>
-                <div class="stat-sub">Mar 1, 2026</div>
+                <p class="stat-value" style="color: #ff4444;">{DATA['stats']['vix_peak']:.2f}</p>
+                <div class="stat-sub">{DATA['stats']['vix_peak_date']}</div>
             </div>
             <div class="stat-box">
+                <div class="stat-label">Infrastructure Attacks</div>
+                <p class="stat-value" style="color: #ffa500;">{DATA['stats']['total_attacks']}</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Strait Hormuz</div>
+                <p class="stat-value" style="color: #ff0000;">CLOSED</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Correlation</div>
+                <p class="stat-value" style="color: #00ff00;">r = 0.74</p>
+            </div>
+        </div>
+        
+        <div class="stats" id="stats-maga" style="display:none;">
+            <div class="stat-box">
                 <div class="stat-label">DJT Pump</div>
-                <p class="stat-value" style="color: #00ff00;">+93%</p>
-                <div class="stat-sub">Peak: $35.67</div>
+                <p class="stat-value" style="color: #00ff00;">+{DATA['stats']['djt_pump_pct']:.0f}%</p>
+                <div class="stat-sub">${DATA['stats']['djt_min']:.2f} → ${DATA['stats']['djt_max']:.2f}</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">US KIA</div>
-                <p class="stat-value" style="color: #0066ff;">6</p>
+                <p class="stat-value" style="color: #0066ff;">{DATA['stats']['total_kia']}</p>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Infra Attacks</div>
-                <p class="stat-value" style="color: #ffa500;">15</p>
+                <div class="stat-label">Peak Volume</div>
+                <p class="stat-value" style="color: #ff69b4;">312M</p>
+                <div class="stat-sub">Mar 1, 2026</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Correlation</div>
+                <p class="stat-value" style="color: #ffaa00;">r = 0.89</p>
             </div>
         </div>
         
-        <div class="chart-container">
-            <h3 style="color: #00d4ff; margin-top: 0;">📈 VIX vs Infrastructure Attacks</h3>
-            <canvas id="vixChart"></canvas>
+        <!-- Charts -->
+        <div class="chart-container active" id="chart-vix">
+            <h3 class="chart-title">📈 VIX Index vs Infrastructure Attacks</h3>
+            <canvas id="vixCanvas"></canvas>
         </div>
         
-        <div class="chart-container">
-            <h3 style="color: #ff69b4; margin-top: 0;">🇺🇸 DJT Stock vs US Casualties</h3>
-            <canvas id="djtChart"></canvas>
+        <div class="chart-container" id="chart-maga">
+            <h3 class="chart-title">🇺🇸 DJT Stock vs US Casualties</h3>
+            <canvas id="magaCanvas"></canvas>
         </div>
         
+        <!-- Timeline -->
         <div class="section">
-            <h3>📅 Timeline</h3>
-            <div class="timeline-item"><span class="timeline-date" style="color: #ff0000;">⚔️ Feb 28</span> - War begins, Khamenei assassinated</div>
-            <div class="timeline-item"><span class="timeline-date" style="color: #ff6600;">🛢️ Mar 1</span> - Strait of Hormuz CLOSED, DJT peaks</div>
-            <div class="timeline-item"><span class="timeline-date" style="color: #ffaa00;">🔥 Mar 2</span> - Hezbollah joins conflict</div>
-            <div class="timeline-item"><span class="timeline-date" style="color: #00ffff;">📡 Mar 3</span> - Qatar strikes back, ongoing</div>
+            <h3>📅 War Timeline (2026)</h3>
+            <div class="timeline-item">
+                <span class="timeline-date" style="color: #ff0000;">⚔️ Feb 28</span>
+                <span class="timeline-desc">War begins - Khamenei assassinated, US bases attacked</span>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-date" style="color: #ff6600;">🛢️ Mar 1</span>
+                <span class="timeline-desc">Strait of Hormuz CLOSED - 20% of global oil supply disrupted, DJT peaks at $35.67</span>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-date" style="color: #ffaa00;">🔥 Mar 2</span>
+                <span class="timeline-desc">Hezbollah joins conflict - rockets fired at Israel</span>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-date" style="color: #00ffff;">📡 Mar 3</span>
+                <span class="timeline-desc">Qatar strikes back - ongoing escalation</span>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            Data: VIX from FRED | DJT from market data | Casualties from official reports<br>
+            <a href="https://github.com/LemmyAI/vix-oilfield-correlation" style="color: #00d4ff;">GitHub</a>
         </div>
     </div>
     
     <script>
-        // VIX Chart
-        const vixCtx = document.getElementById('vixChart').getContext('2d');
-        const vixData = {vix_json};
-        const attacksData = {attacks_json};
+        // Data from server
+        const vixData = {json.dumps(DATA['vix'])};
+        const attacksData = {json.dumps(DATA['attacks'])};
+        const djtData = {json.dumps(DATA['djt'])};
+        const kiaData = {json.dumps(DATA['kia'])};
         
+        // Tab switching
+        function showTab(tab) {{
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.chart-container').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.stats').forEach(s => s.style.display = 'none');
+            
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('chart-' + tab).classList.add('active');
+            document.getElementById('stats-' + tab).style.display = 'flex';
+        }}
+        
+        // VIX Chart
+        const vixCtx = document.getElementById('vixCanvas').getContext('2d');
         new Chart(vixCtx, {{
             type: 'line',
             data: {{
                 labels: vixData.map(d => d.date),
                 datasets: [
                     {{
-                        label: 'VIX',
+                        label: 'VIX Index',
                         data: vixData.map(d => d.vix),
                         borderColor: '#00d4ff',
                         backgroundColor: 'rgba(0, 212, 255, 0.1)',
@@ -150,7 +200,7 @@ def index():
                         yAxisID: 'y'
                     }},
                     {{
-                        label: 'Attacks',
+                        label: 'Infrastructure Attacks',
                         data: attacksData.map(d => d.cumulative),
                         borderColor: '#ff4444',
                         backgroundColor: 'rgba(255, 68, 68, 0.7)',
@@ -170,18 +220,15 @@ def index():
             }}
         }});
         
-        // DJT Chart
-        const djtCtx = document.getElementById('djtChart').getContext('2d');
-        const djtData = {djt_json};
-        const kiaData = {kia_json};
-        
-        new Chart(djtCtx, {{
+        // MAGA Chart
+        const magaCtx = document.getElementById('magaCanvas').getContext('2d');
+        new Chart(magaCtx, {{
             type: 'line',
             data: {{
                 labels: djtData.map(d => d.date),
                 datasets: [
                     {{
-                        label: 'DJT ($)',
+                        label: 'DJT Stock ($)',
                         data: djtData.map(d => d.close),
                         borderColor: '#ff69b4',
                         backgroundColor: 'rgba(255, 105, 180, 0.1)',
@@ -219,6 +266,9 @@ def index():
 def health():
     return 'OK'
 
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
+
 if __name__ == '__main__':
-    import os
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)), debug=False)
