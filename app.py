@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Iran Wars in Strange Numbers by the Looney AI Lemmy!
-A cynical but fun look at market madness during conflict
+Iran Wars in Strange Numbers by the Looney AI Lemmy
+A cynical look at market madness during conflict
 """
 
 from flask import Flask
@@ -30,49 +30,41 @@ def index():
         .subtitle {{ text-align: center; color: #ffa502; margin-top: 0; font-size: 13px; font-style: italic; }}
         .lemmy {{ text-align: center; font-size: 40px; margin: 10px 0; }}
         
-        /* Tabs */
         .tabs {{ display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; }}
-        .tab {{ flex: 1; min-width: 140px; padding: 12px 8px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.3s; }}
+        .tab {{ flex: 1; min-width: 150px; padding: 12px 10px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.3s; }}
         .tab:hover {{ border-color: #555; transform: translateY(-2px); }}
         .tab.active {{ transform: translateY(-2px); }}
-        .tab-title {{ font-size: 13px; font-weight: bold; margin-bottom: 3px; }}
-        .tab-desc {{ font-size: 9px; color: #888; }}
+        .tab-title {{ font-size: 14px; font-weight: bold; margin-bottom: 3px; }}
+        .tab-desc {{ font-size: 10px; color: #888; }}
         #tab-vix.active {{ border-color: #00d4ff; background: linear-gradient(135deg, #1a2a3a 0%, #1a1a2a 100%); }}
         #tab-vix.active .tab-title {{ color: #00d4ff; }}
         #tab-maga.active {{ border-color: #ff69b4; background: linear-gradient(135deg, #2a1a2a 0%, #1a1a2a 100%); }}
         #tab-maga.active .tab-title {{ color: #ff69b4; }}
-        #tab-enthusiasm.active {{ border-color: #00ff88; background: linear-gradient(135deg, #1a2a1a 0%, #1a1a2a 100%); }}
-        #tab-enthusiasm.active .tab-title {{ color: #00ff88; }}
         #tab-rrp.active {{ border-color: #ffa502; background: linear-gradient(135deg, #2a2a1a 0%, #1a1a2a 100%); }}
         #tab-rrp.active .tab-title {{ color: #ffa502; }}
         
-        /* Stats */
         .stats {{ display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }}
         .stat-box {{ flex: 1; min-width: 120px; background: rgba(26, 26, 26, 0.8); border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #333; }}
         .stat-label {{ color: #888; font-size: 11px; margin-bottom: 3px; }}
         .stat-value {{ font-size: 24px; font-weight: bold; margin: 0; }}
         .stat-sub {{ color: #666; font-size: 10px; margin-top: 3px; }}
         
-        /* Charts */
         .chart-container {{ background: rgba(26, 26, 26, 0.9); border-radius: 10px; padding: 15px; margin: 15px 0; display: none; border: 1px solid #333; }}
         .chart-container.active {{ display: block; }}
         .chart-title {{ margin-top: 0; margin-bottom: 10px; font-size: 16px; }}
-        .chart-explain {{ color: #888; font-size: 11px; margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; line-height: 1.5; }}
+        .chart-explain {{ color: #aaa; font-size: 11px; margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; line-height: 1.5; }}
         canvas {{ max-height: 300px; }}
         
-        /* Section */
         .section {{ background: rgba(26, 26, 26, 0.8); border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid #333; }}
         .section h3 {{ color: #ffa502; margin-top: 0; font-size: 14px; }}
         .timeline-item {{ margin-bottom: 10px; padding-left: 20px; position: relative; }}
         .timeline-item::before {{ content: "⬤"; position: absolute; left: 0; font-size: 8px; }}
         .timeline-date {{ font-size: 13px; font-weight: bold; }}
         
-        /* Cynical notes */
         .cynical {{ background: linear-gradient(135deg, #2a1a1a 0%, #1a1a2a 100%); border-radius: 10px; padding: 15px; margin: 15px 0; border-left: 3px solid #ff6b6b; }}
         .cynical h4 {{ color: #ff6b6b; margin: 0 0 10px 0; font-size: 13px; }}
         .cynical p {{ color: #aaa; font-size: 12px; margin: 0; line-height: 1.6; }}
         
-        /* Footer */
         .footer {{ text-align: center; color: #555; font-size: 11px; margin-top: 20px; padding: 15px; border-top: 1px solid #222; }}
         .footer a {{ color: #ffa502; }}
     </style>
@@ -81,21 +73,16 @@ def index():
     <div class="container">
         <div class="lemmy">🦾</div>
         <h1>Iran Wars in Strange Numbers</h1>
-        <p class="subtitle">by the Looney AI Lemmy! (cynical but fun)</p>
+        <p class="subtitle">by the Looney AI Lemmy (cynical perspective)</p>
         
-        <!-- Tabs -->
         <div class="tabs">
             <div class="tab active" id="tab-vix" onclick="showTab('vix')">
                 <div class="tab-title">📈 VIX vs Attacks</div>
                 <div class="tab-desc">Volatility & destruction</div>
             </div>
             <div class="tab" id="tab-maga" onclick="showTab('maga')">
-                <div class="tab-title">🇺🇸 DJT vs KIA</div>
+                <div class="tab-title">🇺🇸 MAGA vs KIA</div>
                 <div class="tab-desc">Stocks & casualties</div>
-            </div>
-            <div class="tab" id="tab-enthusiasm" onclick="showTab('enthusiasm')">
-                <div class="tab-title">📊 MAGA Index vs KIA</div>
-                <div class="tab-desc">Polls & body count</div>
             </div>
             <div class="tab" id="tab-rrp" onclick="showTab('rrp')">
                 <div class="tab-title">🏦 Hidden QE vs Deaths</div>
@@ -103,7 +90,6 @@ def index():
             </div>
         </div>
         
-        <!-- Stats VIX -->
         <div class="stats" id="stats-vix">
             <div class="stat-box">
                 <div class="stat-label">VIX Peak</div>
@@ -113,7 +99,7 @@ def index():
             <div class="stat-box">
                 <div class="stat-label">Infra Attacks</div>
                 <p class="stat-value" style="color: #ffa500;">{DATA['stats']['total_attacks']}</p>
-                <div class="stat-sub">Things exploded</div>
+                <div class="stat-sub">Things destroyed</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Hormuz</div>
@@ -127,7 +113,6 @@ def index():
             </div>
         </div>
         
-        <!-- Stats MAGA (DJT Stock) -->
         <div class="stats" id="stats-maga" style="display:none;">
             <div class="stat-box">
                 <div class="stat-label">DJT Pump</div>
@@ -151,31 +136,6 @@ def index():
             </div>
         </div>
         
-        <!-- Stats MAGA Enthusiasm -->
-        <div class="stats" id="stats-enthusiasm" style="display:none;">
-            <div class="stat-box">
-                <div class="stat-label">Approval Rally</div>
-                <p class="stat-value" style="color: #00ff88;">+{DATA['stats']['maga_bump']}pts</p>
-                <div class="stat-sub">War bump 44%→52%</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">US KIA</div>
-                <p class="stat-value" style="color: #ff4444;">{DATA['stats']['total_kia']}</p>
-                <div class="stat-sub">American dead</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Peak Approval</div>
-                <p class="stat-value" style="color: #00ff88;">{DATA['stats']['maga_high']}%</p>
-                <div class="stat-sub">Mar 1 rally</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Correlation</div>
-                <p class="stat-value" style="color: #ffaa00;">r=-0.91</p>
-                <div class="stat-sub">Death =approval?</div>
-            </div>
-        </div>
-        
-        <!-- Stats RRP -->
         <div class="stats" id="stats-rrp" style="display:none;">
             <div class="stat-box">
                 <div class="stat-label">RRP Drained</div>
@@ -193,93 +153,77 @@ def index():
                 <div class="stat-sub">Peak crisis</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Magic Trick</div>
+                <div class="stat-label">Drop %</div>
                 <p class="stat-value" style="color: #ff69b4;">42%</p>
-                <div class="stat-sub">RRP drop</div>
+                <div class="stat-sub">Of reserves</div>
             </div>
         </div>
         
-        <!-- Chart VIX -->
         <div class="chart-container active" id="chart-vix">
             <h3 class="chart-title" style="color: #00d4ff;">📈 VIX Volatility vs Infrastructure Attacks</h3>
             <canvas id="vixCanvas"></canvas>
         </div>
         
-        <!-- Chart MAGA (DJT Stock) -->
         <div class="chart-container" id="chart-maga">
             <h3 class="chart-title" style="color: #ff69b4;">🇺🇸 DJT Stock vs American Casualties</h3>
             <canvas id="magaCanvas"></canvas>
         </div>
         
-        <!-- Chart MAGA Enthusiasm -->
-        <div class="chart-container" id="chart-enthusiasm">
-            <h3 class="chart-title" style="color: #00ff88;">📊 MAGA Enthusiasm Index vs US KIA</h3>
-            <div class="chart-explain">
-                <strong>MAGA Enthusiasm Index:</strong> Trump approval rating from RealClearPolitics aggregate. 
-                Note the <strong>8-point rally</strong> from 44% to 52% as US casualties mount. 
-                Historical pattern: conflicts boost presidential approval. The question is whether 
-                the families of the {DATA['stats']['total_kia']} fallen share that enthusiasm. 🇺🇸💭
-            </div>
-            <canvas id="enthusiasmCanvas"></canvas>
-        </div>
-        
-        <!-- Chart RRP -->
         <div class="chart-container" id="chart-rrp">
             <h3 class="chart-title" style="color: #ffa502;">🏦 Hidden QE vs Conflict Deaths</h3>
             <div class="chart-explain">
                 <strong>What is RRP?</strong> The Fed's Reverse Repo facility is where banks park excess cash overnight. 
-                When RRP drops <strong>$178 BILLION</strong> in days, that cash floods into markets - covert liquidity injection 
+                When RRP drops <strong>${DATA['stats']['rrp_drop']:.0f} BILLION</strong> in days, that cash floods into markets - covert liquidity injection 
                 without official QE announcement. They call it "liquidity management." We call it <strong>Hidden QE</strong>. 
-                Notice how it tanked exactly when the war started? 🤔
+                Note how it tanked when the war started.
             </div>
             <canvas id="rrpCanvas"></canvas>
         </div>
         
-        <!-- Cynical Note -->
         <div class="cynical">
             <h4>🦾 Lemmy's Cynical Take</h4>
             <p>
-                Funny how VIX spikes, DJT pumps, approval rallies +8pts, and the Fed "magically" drains $178B from reverse repos 
-                all during the same conflict. Markets feast on chaos while 1,772 people died. 
-                But hey, at least someone's portfolio is up 93%! 📈💀
+                VIX spikes, DJT pumps 93%, the Fed "magically" drains ${DATA['stats']['rrp_drop']:.0f}B from reverse repos 
+                during the same conflict. Markets feast on chaos while {DATA['stats']['total_deaths']:,} people died. 
+                Make of that what you will.
             </p>
         </div>
         
-        <!-- Timeline -->
         <div class="section">
             <h3>📅 War Timeline (Feb 28 - Mar 3, 2026)</h3>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #ff0000;">⚔️ Feb 28</span>
-                <span style="color: #aaa;">War starts - Khamenei assassinated, missiles fly, $423B → $298B RRP drain begins</span>
+                <span style="color: #aaa;">War starts - Khamenei assassinated, missiles fly, RRP drain begins</span>
             </div>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #ff6600;">🛢️ Mar 1</span>
-                <span style="color: #aaa;">Hormuz CLOSED - DJT hits $35.67, RRP crashes to $245B, peak fear</span>
+                <span style="color: #aaa;">Hormuz CLOSED - DJT hits ${DATA['stats']['djt_max']:.2f}, RRP crashes to ${DATA['stats']['rrp_min']:.0f}B</span>
             </div>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #ffaa00;">🔥 Mar 2</span>
-                <span style="color: #aaa;">Hezbollah joins - 1,544 total deaths, markets "stabilizing" 😏</span>
+                <span style="color: #aaa;">Hezbollah joins - 1,544 total deaths</span>
             </div>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #00ffff;">📡 Mar 3</span>
-                <span style="color: #aaa;">Qatar strikes back - 1,772 dead, RRP slightly recovering (mission accomplished?)</span>
+                <span style="color: #aaa;">Qatar strikes back - {DATA['stats']['total_deaths']:,} dead total</span>
             </div>
         </div>
         
         <div class="footer">
-            Data: FRED, RCP, Market Data, Official Reports | <a href="https://github.com/LemmyAI/vix-oilfield-correlation">GitHub</a><br>
+            Data: FRED, Market Data, Official Reports | <a href="https://github.com/LemmyAI/vix-oilfield-correlation">GitHub</a><br>
             Updated: {DATA['stats']['last_updated']} | 🦾 Powered by cynicism and charts
         </div>
     </div>
     
     <script>
+        const dates = {json.dumps(DATA['dates'])};
+        const warStartIdx = {DATA['war_start_idx']};
         const vixData = {json.dumps(DATA['vix'])};
-        const attacksData = {json.dumps(DATA['attacks'])};
         const djtData = {json.dumps(DATA['djt'])};
+        const attacksData = {json.dumps(DATA['attacks'])};
         const kiaData = {json.dumps(DATA['kia'])};
         const rrpData = {json.dumps(DATA['rrp'])};
         const deathsData = {json.dumps(DATA['deaths'])};
-        const magaApprovalData = {json.dumps(DATA['maga_approval'])};
         
         function showTab(tab) {{
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -290,79 +234,44 @@ def index():
             document.getElementById('stats-' + tab).style.display = 'flex';
         }}
         
-        // Helper to fill missing KIA dates
-        function fillKIADates(approvalData, kiaData) {{
-            const kiaMap = {{}};
-            kiaData.forEach(d => kiaMap[d.date] = d.cumulative);
-            let lastKIA = 0;
-            return approvalData.map(d => {{
-                if (kiaMap[d.date] !== undefined) lastKIA = kiaMap[d.date];
-                return lastKIA;
-            }});
-        }}
-        
-        const kiaFilled = fillKIADates(magaApprovalData, kiaData);
-        
         // VIX Chart
         new Chart(document.getElementById('vixCanvas').getContext('2d'), {{
             type: 'line',
             data: {{
-                labels: vixData.map(d => d.date),
+                labels: dates,
                 datasets: [
-                    {{ label: 'VIX', data: vixData.map(d => d.vix), borderColor: '#00d4ff', backgroundColor: 'rgba(0, 212, 255, 0.1)', fill: true, tension: 0.4, yAxisID: 'y' }},
-                    {{ label: 'Attacks', data: attacksData.map(d => d.cumulative), borderColor: '#ff4444', backgroundColor: 'rgba(255, 68, 68, 0.7)', type: 'bar', yAxisID: 'y1' }}
+                    {{ label: 'VIX', data: vixData, borderColor: '#00d4ff', backgroundColor: 'rgba(0, 212, 255, 0.1)', fill: true, tension: 0.4, yAxisID: 'y', spanGaps: true }},
+                    {{ label: 'Attacks', data: attacksData, borderColor: '#ff4444', backgroundColor: 'rgba(255, 68, 68, 0.7)', type: 'bar', yAxisID: 'y1' }}
                 ]
             }},
             options: {{
                 responsive: true,
                 plugins: {{ legend: {{ labels: {{ color: 'white' }} }} }},
                 scales: {{
-                    x: {{ ticks: {{ color: '#888' }}, grid: {{ color: '#333' }} }},
+                    x: {{ ticks: {{ color: '#888', maxRotation: 45 }}, grid: {{ color: '#333' }} }},
                     y: {{ type: 'linear', position: 'left', ticks: {{ color: '#00d4ff' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'VIX', color: '#00d4ff' }} }},
                     y1: {{ type: 'linear', position: 'right', ticks: {{ color: '#ff4444' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'Attacks', color: '#ff4444' }} }}
                 }}
             }}
         }});
         
-        // MAGA (DJT Stock) Chart
+        // MAGA Chart
         new Chart(document.getElementById('magaCanvas').getContext('2d'), {{
             type: 'line',
             data: {{
-                labels: djtData.map(d => d.date),
+                labels: dates,
                 datasets: [
-                    {{ label: 'DJT ($)', data: djtData.map(d => d.close), borderColor: '#ff69b4', backgroundColor: 'rgba(255, 105, 180, 0.1)', fill: true, tension: 0.4, yAxisID: 'y' }},
-                    {{ label: 'US KIA', data: kiaData.map(d => d.cumulative), borderColor: '#0066ff', borderWidth: 3, pointRadius: 6, pointBackgroundColor: '#0066ff', yAxisID: 'y1' }}
+                    {{ label: 'DJT ($)', data: djtData, borderColor: '#ff69b4', backgroundColor: 'rgba(255, 105, 180, 0.1)', fill: true, tension: 0.4, yAxisID: 'y', spanGaps: true }},
+                    {{ label: 'US KIA', data: kiaData, borderColor: '#0066ff', borderWidth: 3, pointRadius: 6, pointBackgroundColor: '#0066ff', yAxisID: 'y1', spanGaps: true }}
                 ]
             }},
             options: {{
                 responsive: true,
                 plugins: {{ legend: {{ labels: {{ color: 'white' }} }} }},
                 scales: {{
-                    x: {{ ticks: {{ color: '#888' }}, grid: {{ color: '#333' }} }},
+                    x: {{ ticks: {{ color: '#888', maxRotation: 45 }}, grid: {{ color: '#333' }} }},
                     y: {{ type: 'linear', position: 'left', ticks: {{ color: '#ff69b4' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'DJT ($)', color: '#ff69b4' }} }},
                     y1: {{ type: 'linear', position: 'right', ticks: {{ color: '#0066ff' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'US KIA', color: '#0066ff' }} }}
-                }}
-            }}
-        }});
-        
-        // MAGA Enthusiasm Chart
-        new Chart(document.getElementById('enthusiasmCanvas').getContext('2d'), {{
-            type: 'line',
-            data: {{
-                labels: magaApprovalData.map(d => d.date),
-                datasets: [
-                    {{ label: 'Approval %', data: magaApprovalData.map(d => d.approval), borderColor: '#00ff88', backgroundColor: 'rgba(0, 255, 136, 0.15)', fill: true, tension: 0.4, yAxisID: 'y', borderWidth: 3 }},
-                    {{ label: 'Disapproval %', data: magaApprovalData.map(d => d.disapproval), borderColor: '#ff4444', backgroundColor: 'rgba(255, 68, 68, 0.1)', fill: true, tension: 0.4, yAxisID: 'y', borderDash: [5, 5] }},
-                    {{ label: 'US KIA', data: kiaFilled, borderColor: '#0066ff', borderWidth: 3, pointRadius: 6, pointBackgroundColor: '#0066ff', yAxisID: 'y1' }}
-                ]
-            }},
-            options: {{
-                responsive: true,
-                plugins: {{ legend: {{ labels: {{ color: 'white' }} }} }},
-                scales: {{
-                    x: {{ ticks: {{ color: '#888' }}, grid: {{ color: '#333' }} }},
-                    y: {{ type: 'linear', position: 'left', min: 40, max: 60, ticks: {{ color: '#00ff88' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'Approval %', color: '#00ff88' }} }},
-                    y1: {{ type: 'linear', position: 'right', min: 0, ticks: {{ color: '#0066ff' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'US KIA', color: '#0066ff' }} }}
                 }}
             }}
         }});
@@ -371,17 +280,17 @@ def index():
         new Chart(document.getElementById('rrpCanvas').getContext('2d'), {{
             type: 'line',
             data: {{
-                labels: rrpData.map(d => d.date),
+                labels: dates,
                 datasets: [
-                    {{ label: 'RRP ($B)', data: rrpData.map(d => d.rrp_billion), borderColor: '#ffa502', backgroundColor: 'rgba(255, 165, 2, 0.1)', fill: true, tension: 0.4, yAxisID: 'y' }},
-                    {{ label: 'Total Deaths', data: deathsData.map(d => d.cumulative), borderColor: '#ff6b6b', borderWidth: 3, pointRadius: 6, pointBackgroundColor: '#ff6b6b', yAxisID: 'y1' }}
+                    {{ label: 'RRP ($B)', data: rrpData, borderColor: '#ffa502', backgroundColor: 'rgba(255, 165, 2, 0.1)', fill: true, tension: 0.4, yAxisID: 'y', spanGaps: true }},
+                    {{ label: 'Total Deaths', data: deathsData, borderColor: '#ff6b6b', borderWidth: 3, pointRadius: 6, pointBackgroundColor: '#ff6b6b', yAxisID: 'y1', spanGaps: true }}
                 ]
             }},
             options: {{
                 responsive: true,
                 plugins: {{ legend: {{ labels: {{ color: 'white' }} }} }},
                 scales: {{
-                    x: {{ ticks: {{ color: '#888' }}, grid: {{ color: '#333' }} }},
+                    x: {{ ticks: {{ color: '#888', maxRotation: 45 }}, grid: {{ color: '#333' }} }},
                     y: {{ type: 'linear', position: 'left', ticks: {{ color: '#ffa502' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'RRP ($B)', color: '#ffa502' }} }},
                     y1: {{ type: 'linear', position: 'right', ticks: {{ color: '#ff6b6b' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'Deaths', color: '#ff6b6b' }} }}
                 }}
