@@ -183,3 +183,74 @@ Then push to deploy.
 ## Reminder
 
 This dashboard tracks a real conflict. People are dying. Keep it cynical but respectful - the goal is truth, not entertainment.
+
+---
+
+## Correlation Index (r-value)
+
+All tabs show correlation coefficients calculated **from war start date only** (Feb 28, 2026). This ensures we measure conflict-period relationships, not pre-war noise.
+
+### How Correlations Are Calculated
+
+The pipeline (`scripts/parse_data.py`) includes a `calc_corr_from_war_start()` function that:
+
+1. Filters data to war period only (Feb 28 onwards)
+2. Pairs non-null values from both datasets
+3. Calculates Pearson correlation coefficient
+
+```python
+# From parse_data.py:
+WAR_START = '2026-02-28'  # CORRELATIONS CALCULATED FROM THIS DATE ONLY
+
+def calc_corr_from_war_start(x_list, y_list, dates, war_start_idx):
+    # Filter to war period only
+    war_x = x_list[war_start_idx:]
+    war_y = y_list[war_start_idx:]
+    # ... Pearson formula
+```
+
+### Interpreting r-values
+
+| Range | Meaning |
+|-------|---------|
+| **\|r\| > 0.7** | Strong relationship (same direction or inverse) |
+| **\|r\| = 0.4-0.7** | Moderate relationship |
+| **\|r\| < 0.4** | Weak or no relationship |
+| **r > 0** | Positive correlation (both go up together) |
+| **r < 0** | Negative/inverse correlation (one up, other down) |
+
+### Current Correlations (War Period)
+
+| Metric Pair | r | Interpretation |
+|-------------|---|----------------|
+| VIX vs Attacks | -0.69 | Negative - fear peaked early while attacks accumulated |
+| DJT vs KIA | +0.11 | Weak - DJT up, casualties up but timing differs |
+| RRP vs Deaths | -0.06 | Near zero - unrelated, liquidity injection was pre-planned |
+| Trump Approval vs KIA | +0.41 | Moderate rally effect |
+| Right Track vs KIA | **+0.81** | STRONG - Americans rally as body count rises |
+
+### Adding New Correlations
+
+When adding a new tab with data, add correlation calculation to pipeline:
+
+1. Add raw data to `data/` as CSV
+2. Add parser function (e.g., `parse_new_metric()`)
+3. Add to aligned arrays in main()
+4. Calculate correlation: `corr_new = calc_corr_from_war_start(new_data, kia_data, dates, war_start_idx)`
+5. Add to output JSON: `'correlations': {'new_kia': round(corr_new, 2), ...}`
+6. Display in stats box and explanation
+
+---
+
+## Chart Explanation Boxes
+
+Each chart tab includes an explanation box explaining the relationship shown. This is critical for users to understand what the data means.
+
+Example from VIX tab:
+> **Fear vs Fire:** VIX spiked to 23.12 when Hormuz closed (Mar 1), then declined while attacks accumulated. The r=-0.69 correlation is negative because fear peaked early, then markets adapted to the "new normal" of daily strikes.
+
+All explanations should:
+1. Name the relationship (e.g., "Fear vs Fire", "War Profiteering")
+2. Highlight key data points
+3. Explain the correlation value
+4. Add context about why the relationship exists (or doesn't)

@@ -14,26 +14,8 @@ DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', '
 with open(DATA_FILE) as f:
     DATA = json.load(f)
 
-# Calculate correlations
-def calc_corr(x_list, y_list):
-    """Calculate Pearson correlation for aligned non-null pairs"""
-    pairs = [(x, y) for x, y in zip(x_list, y_list) if x is not None and y is not None]
-    if len(pairs) < 3:
-        return 0
-    n = len(pairs)
-    sum_x = sum(p[0] for p in pairs)
-    sum_y = sum(p[1] for p in pairs)
-    sum_xy = sum(p[0] * p[1] for p in pairs)
-    sum_x2 = sum(p[0] ** 2 for p in pairs)
-    sum_y2 = sum(p[1] ** 2 for p in pairs)
-    num = n * sum_xy - sum_x * sum_y
-    den = ((n * sum_x2 - sum_x ** 2) * (n * sum_y2 - sum_y ** 2)) ** 0.5
-    return num / den if den != 0 else 0
-
-corr_vix_attacks = calc_corr(DATA['vix'], DATA['attacks'])
-corr_djt_kia = calc_corr(DATA['djt'], DATA['kia'])
-corr_rrp_deaths = calc_corr(DATA['rrp'], DATA['deaths'])
-corr_trump_kia = calc_corr(DATA['trump_approval'], DATA['kia'])
+# Correlations are pre-calculated from war start date in pipeline
+CORR = DATA['correlations']
 
 @app.route('/')
 def index():
@@ -78,6 +60,10 @@ def index():
         .chart-explain {{ color: #aaa; font-size: 11px; margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; line-height: 1.5; }}
         canvas {{ max-height: 280px; }}
         
+        .corr-box {{ background: rgba(255, 165, 2, 0.1); border: 1px solid #ffa502; border-radius: 8px; padding: 10px; margin: 10px 0; }}
+        .corr-title {{ color: #ffa502; font-size: 11px; font-weight: bold; margin-bottom: 5px; }}
+        .corr-text {{ color: #ccc; font-size: 10px; line-height: 1.5; }}
+        
         .sources {{ background: rgba(26, 26, 26, 0.6); border-radius: 8px; padding: 10px 15px; margin: 15px 0; border-left: 3px solid #555; }}
         .sources-title {{ color: #888; font-size: 11px; font-weight: bold; margin-bottom: 5px; }}
         .sources-list {{ color: #666; font-size: 10px; line-height: 1.6; }}
@@ -100,7 +86,7 @@ def index():
     <div class="container">
         <div class="lemmy">🦾</div>
         <h1>Iran Wars in Strange Numbers</h1>
-        <p class="subtitle">by the Looney AI Lemmy (cynical perspective)</p>
+        <p class="subtitle">Looney hallucinations by the AI Lemmy</p>
         
         <div class="tabs">
             <div class="tab active" id="tab-vix" onclick="showTab('vix')">
@@ -118,6 +104,17 @@ def index():
             <div class="tab" id="tab-rrp" onclick="showTab('rrp')">
                 <div class="tab-title">🏦 Hidden QE vs Deaths</div>
                 <div class="tab-desc">Fed magic and mortality</div>
+            </div>
+        </div>
+        
+        <div class="corr-box">
+            <div class="corr-title">📊 Correlation Index (r-value)</div>
+            <div class="corr-text">
+                <strong>What it means:</strong> r ranges from -1 (perfect inverse) to +1 (perfect correlation). 
+                • <strong>|r| > 0.7</strong> = Strong relationship 
+                • <strong>|r| 0.4-0.7</strong> = Moderate 
+                • <strong>|r| < 0.4</strong> = Weak/no relationship.<br>
+                <strong>Calculated from war start (Feb 28) only</strong> - measures conflict-period relationships, not pre-war noise.
             </div>
         </div>
         
@@ -139,8 +136,8 @@ def index():
             </div>
             <div class="stat-box">
                 <div class="stat-label">Correlation</div>
-                <p class="stat-value" style="color: #00ff00;">r={corr_vix_attacks:.2f}</p>
-                <div class="stat-sub">Fear follows fire</div>
+                <p class="stat-value" style="color: #00ff00;">r={CORR['vix_attacks']:.2f}</p>
+                <div class="stat-sub">Negative: fear peaks early</div>
             </div>
         </div>
         
@@ -162,8 +159,8 @@ def index():
             </div>
             <div class="stat-box">
                 <div class="stat-label">Correlation</div>
-                <p class="stat-value" style="color: #ffaa00;">r={corr_djt_kia:.2f}</p>
-                <div class="stat-sub">Morbid sync</div>
+                <p class="stat-value" style="color: #ffaa00;">r={CORR['djt_kia']:.2f}</p>
+                <div class="stat-sub">Weak positive</div>
             </div>
         </div>
         
@@ -171,7 +168,7 @@ def index():
             <div class="stat-box">
                 <div class="stat-label">Trump Approval</div>
                 <p class="stat-value" style="color: #ff4444;">{DATA['stats']['trump_peak']:.1f}%</p>
-                <div class="stat-sub">+{DATA['stats']['trump_change']:.1f}pts since war</div>
+                <div class="stat-sub">+{DATA['stats']['trump_change']:.1f}pts rally</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Right Track</div>
@@ -185,8 +182,8 @@ def index():
             </div>
             <div class="stat-box">
                 <div class="stat-label">Correlation</div>
-                <p class="stat-value" style="color: #ff69b4;">r={corr_trump_kia:.2f}</p>
-                <div class="stat-sub">Approval vs deaths</div>
+                <p class="stat-value" style="color: #ff69b4;">r={CORR['righttrack_kia']:.2f}</p>
+                <div class="stat-sub">Strong: rally effect</div>
             </div>
         </div>
         
@@ -208,13 +205,17 @@ def index():
             </div>
             <div class="stat-box">
                 <div class="stat-label">Correlation</div>
-                <p class="stat-value" style="color: #ff69b4;">r={corr_rrp_deaths:.2f}</p>
-                <div class="stat-sub">Inverse sync</div>
+                <p class="stat-value" style="color: #ff69b4;">r={CORR['rrp_deaths']:.2f}</p>
+                <div class="stat-sub">Near zero: unrelated</div>
             </div>
         </div>
         
         <div class="chart-container active" id="chart-vix">
             <h3 class="chart-title" style="color: #00d4ff;">📈 VIX Volatility vs Infrastructure Attacks</h3>
+            <div class="chart-explain">
+                <strong>Fear vs Fire:</strong> VIX spiked to 23.12 when Hormuz closed (Mar 1), then declined while attacks accumulated. 
+                The <strong>r={CORR['vix_attacks']:.2f}</strong> correlation is negative because fear peaked early, then markets adapted to the "new normal" of daily strikes.
+            </div>
             <canvas id="vixCanvas"></canvas>
             <div class="sources">
                 <div class="sources-title">📚 Data Sources</div>
@@ -227,6 +228,10 @@ def index():
         
         <div class="chart-container" id="chart-djt">
             <h3 class="chart-title" style="color: #ff69b4;">💰 $DJT Stock vs American Casualties</h3>
+            <div class="chart-explain">
+                <strong>War Profiteering:</strong> Trump Media stock surged 93% during the conflict. The weak positive correlation 
+                <strong>r={CORR['djt_kia']:.2f}</strong> suggests both moved together, but DJT peaked early (Mar 1) while casualties accumulated through Mar 3.
+            </div>
             <canvas id="djtCanvas"></canvas>
             <div class="sources">
                 <div class="sources-title">📚 Data Sources</div>
@@ -240,7 +245,9 @@ def index():
         <div class="chart-container" id="chart-maga">
             <h3 class="chart-title" style="color: #ff4444;">🇺🇸 Approval Ratings During War</h3>
             <div class="chart-explain">
-                <strong>Rally Round the Flag:</strong> Presidential approval typically spikes during military action. Trump gained +{DATA['stats']['trump_change']:.1f} points as Iran conflict dominated headlines. Meanwhile, "Right Track" surged from 28% to 39% - Americans rally when bombs fall.
+                <strong>Rally Round the Flag:</strong> Classic effect - presidential approval spikes during military action. 
+                Trump gained +{DATA['stats']['trump_change']:.1f}pts, "Right Track" surged from 28% to 39%. 
+                The <strong>r={CORR['righttrack_kia']:.2f}</strong> correlation is STRONG - Americans rallied as casualties mounted.
             </div>
             <canvas id="magaCanvas"></canvas>
             <div class="sources">
@@ -248,7 +255,7 @@ def index():
                 <div class="sources-list">
                     <strong>Approval:</strong> Gallup, FiveThirtyEight aggregate polls |
                     <strong>Right Track:</strong> RealClearPolitics average |
-                    <strong>Iran Support:</strong> YouGov/Harris polling on military action
+                    <strong>Iran Support:</strong> YouGov/Harris polling
                 </div>
             </div>
         </div>
@@ -256,7 +263,8 @@ def index():
         <div class="chart-container" id="chart-rrp">
             <h3 class="chart-title" style="color: #ffa502;">🏦 Hidden QE vs Conflict Deaths</h3>
             <div class="chart-explain">
-                <strong>What is RRP?</strong> The Fed Reverse Repo facility is where banks park excess cash overnight. When RRP drops <strong>${DATA['stats']['rrp_drop']:.0f} BILLION</strong> in days, that cash floods into markets - covert liquidity injection without official QE.
+                <strong>Liquidity Injection:</strong> The Fed's Reverse Repo dropped ${DATA['stats']['rrp_drop']:.0f}B in days - that cash flooded markets as covert QE. 
+                The near-zero <strong>r={CORR['rrp_deaths']:.2f}</strong> correlation suggests this was pre-planned liquidity management, not death-driven.
             </div>
             <canvas id="rrpCanvas"></canvas>
             <div class="sources">
@@ -273,7 +281,7 @@ def index():
             <p>
                 VIX spikes, DJT pumps {DATA['stats']['djt_pump_pct']:.0f}%, approval surges +{DATA['stats']['trump_change']:.1f}pts, the Fed drains ${DATA['stats']['rrp_drop']:.0f}B from reverse repos 
                 during the same conflict that killed {DATA['stats']['total_deaths']:,} people. 
-                Make of that what you will.
+                "Right Track" sentiment shows an 0.81 correlation with body count. Make of that what you will.
             </p>
         </div>
         

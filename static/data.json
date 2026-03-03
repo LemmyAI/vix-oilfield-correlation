@@ -192,6 +192,13 @@
     59.1,
     57.4
   ],
+  "correlations": {
+    "vix_attacks": -0.69,
+    "djt_kia": 0.11,
+    "rrp_deaths": -0.06,
+    "trump_kia": 0.41,
+    "righttrack_kia": 0.81
+  },
   "stats": {
     "vix_peak": 23.12,
     "vix_peak_date": "2026-03-01",
@@ -207,7 +214,6 @@
     "trump_start": 47.2,
     "trump_peak": 54.8,
     "trump_change": 7.6,
-    "biden_low": 34.5,
-    "last_updated": "2026-03-03 22:19"
+    "last_updated": "2026-03-03 22:29"
   }
 }

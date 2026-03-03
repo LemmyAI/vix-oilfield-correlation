@@ -2,6 +2,9 @@
 """
 Data Pipeline for Iran Wars in Strange Numbers Dashboard
 Run locally to validate and generate clean JSON data files.
+
+IMPORTANT: Correlations are calculated from WAR START DATE (Feb 28) only,
+not from the full dataset. This ensures we're measuring conflict-period relationships.
 """
 
 import json
@@ -11,6 +14,8 @@ from datetime import datetime, timedelta
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'static')
+
+WAR_START = '2026-02-28'  # CORRELATIONS CALCULATED FROM THIS DATE ONLY
 
 def parse_date(s):
     return datetime.strptime(s, '%Y-%m-%d')
@@ -28,7 +33,6 @@ def parse_int(s):
     return int(s)
 
 def get_date_range(start_date, end_date):
-    """Generate all dates between start and end"""
     dates = []
     current = start_date
     while current <= end_date:
@@ -121,10 +125,47 @@ def parse_approval():
             }
     return data
 
+def calc_corr_from_war_start(x_list, y_list, dates, war_start_idx):
+    """
+    Calculate Pearson correlation ONLY from war start date.
+    This ensures we measure conflict-period relationships, not pre-war noise.
+    
+    Parameters:
+        x_list, y_list: Full data arrays (may contain None for missing values)
+        dates: Date labels for each index
+        war_start_idx: Index where war started (Feb 28)
+    
+    Returns:
+        Correlation coefficient (-1 to 1)
+    """
+    # Filter to war period only
+    war_x = x_list[war_start_idx:]
+    war_y = y_list[war_start_idx:]
+    
+    # Get non-null pairs
+    pairs = [(x, y) for x, y in zip(war_x, war_y) if x is not None and y is not None]
+    
+    if len(pairs) < 2:
+        return 0
+    
+    n = len(pairs)
+    sum_x = sum(p[0] for p in pairs)
+    sum_y = sum(p[1] for p in pairs)
+    sum_xy = sum(p[0] * p[1] for p in pairs)
+    sum_x2 = sum(p[0] ** 2 for p in pairs)
+    sum_y2 = sum(p[1] ** 2 for p in pairs)
+    
+    num = n * sum_xy - sum_x * sum_y
+    den = ((n * sum_x2 - sum_x ** 2) * (n * sum_y2 - sum_y ** 2)) ** 0.5
+    
+    return num / den if den != 0 else 0
+
 def main():
     print("=" * 70)
     print("🦾 IRAN WARS IN STRANGE NUMBERS - DATA PIPELINE")
     print("=" * 70)
+    print(f"\n⚠️  CORRELATIONS CALCULATED FROM WAR START: {WAR_START}")
+    print("    (Feb 28, 2026 - conflict period only)")
     
     # Load all data as dicts first
     print("\n📊 Loading data files...")
@@ -144,10 +185,12 @@ def main():
     # Generate aligned data for ALL dates
     date_range = get_date_range(min_date, max_date)
     dates = [format_date(d) for d in date_range]
+    war_start_idx = dates.index(WAR_START) if WAR_START in dates else 0
     
     print(f"   Date range: {dates[0]} to {dates[-1]} ({len(dates)} days)")
+    print(f"   War start index: {war_start_idx} ({dates[war_start_idx]})")
     
-    # Build aligned arrays (null for missing data)
+    # Build aligned arrays
     vix = []
     djt = []
     djt_vol = []
@@ -170,7 +213,6 @@ def main():
         djt.append(djt_dict.get(d, {}).get('close'))
         djt_vol.append(djt_dict.get(d, {}).get('volume'))
         
-        # Cumulative metrics - carry forward last known value
         if d in attacks_dict:
             last_attack = attacks_dict[d]
         attacks.append(last_attack if last_attack > 0 else None)
@@ -185,7 +227,6 @@ def main():
             last_death = deaths_dict[d]
         deaths.append(last_death if last_death > 0 else None)
         
-        # Approval ratings
         if d in approval_dict:
             trump_app.append(approval_dict[d]['trump'])
             biden_app.append(approval_dict[d]['biden'])
@@ -197,13 +238,19 @@ def main():
             right_track.append(None)
             iran_app.append(None)
     
-    print(f"\n   ✓ VIX: {sum(1 for v in vix if v is not None)} data points")
-    print(f"   ✓ DJT: {sum(1 for v in djt if v is not None)} data points")
-    print(f"   ✓ Attacks: {sum(1 for v in attacks if v is not None)} data points")
-    print(f"   ✓ KIA: {sum(1 for v in kia if v is not None)} data points")
-    print(f"   ✓ RRP: {sum(1 for v in rrp if v is not None)} data points")
-    print(f"   ✓ Deaths: {sum(1 for v in deaths if v is not None)} data points")
-    print(f"   ✓ Approval: {sum(1 for v in trump_app if v is not None)} data points")
+    # Calculate correlations FROM WAR START ONLY
+    print("\n📈 Calculating correlations (war period only)...")
+    corr_vix_attacks = calc_corr_from_war_start(vix, attacks, dates, war_start_idx)
+    corr_djt_kia = calc_corr_from_war_start(djt, kia, dates, war_start_idx)
+    corr_rrp_deaths = calc_corr_from_war_start(rrp, deaths, dates, war_start_idx)
+    corr_trump_kia = calc_corr_from_war_start(trump_app, kia, dates, war_start_idx)
+    corr_righttrack_kia = calc_corr_from_war_start(right_track, kia, dates, war_start_idx)
+    
+    print(f"   VIX vs Attacks: r={corr_vix_attacks:.2f}")
+    print(f"   DJT vs KIA: r={corr_djt_kia:.2f}")
+    print(f"   RRP vs Deaths: r={corr_rrp_deaths:.2f}")
+    print(f"   Trump Approval vs KIA: r={corr_trump_kia:.2f}")
+    print(f"   Right Track vs KIA: r={corr_righttrack_kia:.2f}")
     
     # Stats
     vix_vals = [v for v in vix if v is not None]
@@ -223,13 +270,17 @@ def main():
     total_kia = max(k for k in kia if k is not None)
     total_deaths = max(d for d in deaths if d is not None)
     
-    # Approval stats
     trump_start = trump_app[0] if trump_app[0] is not None else trump_vals[0]
     trump_peak = max(trump_vals)
     trump_change = trump_peak - trump_start if trump_vals else 0
     
-    biden_start = biden_app[0] if biden_app[0] is not None else [v for v in biden_app if v is not None][0]
-    biden_low = min([v for v in biden_app if v is not None])
+    print(f"\n   ✓ VIX: {sum(1 for v in vix if v is not None)} data points")
+    print(f"   ✓ DJT: {sum(1 for v in djt if v is not None)} data points")
+    print(f"   ✓ Attacks: {sum(1 for v in attacks if v is not None)} data points")
+    print(f"   ✓ KIA: {sum(1 for v in kia if v is not None)} data points")
+    print(f"   ✓ RRP: {sum(1 for v in rrp if v is not None)} data points")
+    print(f"   ✓ Deaths: {sum(1 for v in deaths if v is not None)} data points")
+    print(f"   ✓ Approval: {sum(1 for v in trump_app if v is not None)} data points")
     
     print("\n" + "=" * 70)
     print("📋 SUMMARY - INSPECT BEFORE COMMITTING")
@@ -241,14 +292,13 @@ def main():
     print(f"   US KIA: {total_kia}")
     print(f"   Total Conflict Deaths: {total_deaths:,}")
     print(f"\n   Trump Approval: {trump_start:.1f}% → {trump_peak:.1f}% (+{trump_change:.1f}pts)")
-    print(f"   'Right Track': {right_track[0]:.1f}% → {max([v for v in right_track if v is not None]):.1f}%")
-    print("\n" + "=" * 70)
+    print("=" * 70)
     
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     output = {
         'dates': dates,
-        'war_start_idx': dates.index('2026-02-28') if '2026-02-28' in dates else 0,
+        'war_start_idx': war_start_idx,
         'vix': vix,
         'djt': djt,
         'djt_volume': djt_vol,
@@ -260,6 +310,13 @@ def main():
         'biden_approval': biden_app,
         'right_track': right_track,
         'iran_approval': iran_app,
+        'correlations': {
+            'vix_attacks': round(corr_vix_attacks, 2),
+            'djt_kia': round(corr_djt_kia, 2),
+            'rrp_deaths': round(corr_rrp_deaths, 2),
+            'trump_kia': round(corr_trump_kia, 2),
+            'righttrack_kia': round(corr_righttrack_kia, 2)
+        },
         'stats': {
             'vix_peak': round(vix_peak, 2),
             'vix_peak_date': vix_peak_date,
@@ -275,7 +332,6 @@ def main():
             'trump_start': round(trump_start, 1),
             'trump_peak': round(trump_peak, 1),
             'trump_change': round(trump_change, 1),
-            'biden_low': round(biden_low, 1),
             'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M')
         }
     }
