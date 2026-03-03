@@ -8,7 +8,7 @@ from flask import Flask
 import json
 import os
 
-app = Flask(Flask(__name__, static_folder='static')
+app = Flask(__name__, static_folder='static')
 
 DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'data.json')
 with open(DATA_FILE) as f:
@@ -240,7 +240,7 @@ def index():
         <div class="chart-container" id="chart-maga">
             <h3 class="chart-title" style="color: #ff4444;">🇺🇸 Approval Ratings During War</h3>
             <div class="chart-explain">
-                <strong>Rally Round the Flag:</strong> Presidential approval typically spikes during military action. Trump gained +7.6 points as Iran conflict dominated headlines. Meanwhile, "Right Track" surged from 28% to 39% - Americans rally when bombs fall.
+                <strong>Rally Round the Flag:</strong> Presidential approval typically spikes during military action. Trump gained +{DATA['stats']['trump_change']:.1f} points as Iran conflict dominated headlines. Meanwhile, "Right Track" surged from 28% to 39% - Americans rally when bombs fall.
             </div>
             <canvas id="magaCanvas"></canvas>
             <div class="sources">
@@ -285,7 +285,7 @@ def index():
             </div>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #ff6600;">Mar 1</span>
-                <span style="color: #aaa;">Hormuz CLOSED - DJT ${DATA['stats']['djt_max']:.2f}, Trump approval 54.8%</span>
+                <span style="color: #aaa;">Hormuz CLOSED - DJT ${DATA['stats']['djt_max']:.2f}, Trump approval {DATA['stats']['trump_peak']:.1f}%</span>
             </div>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #ffaa00;">Mar 2</span>
