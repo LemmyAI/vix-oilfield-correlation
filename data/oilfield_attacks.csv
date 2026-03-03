@@ -1,22 +1,16 @@
 date,attack_type,target,location,cumulative_attacks,description
-2025-06-13,missile,Iranian nuclear facility,Natanz,1,IDF strikes Natanz nuclear facility - first day of war
-2025-06-13,missile,Energy infrastructure,Tehran,2,Strikes on Tehran energy infrastructure
-2025-06-13,sabotage,Oil depot,South Pars,3,Mossad sabotage operations at South Pars gas field
-2025-06-14,missile,Nuclear facility,Isfahan,4,Strikes on Isfahan nuclear technology center
-2025-06-14,drone,Oil refinery,Bandar Abbas,5,Drone attacks on Bandar Abbas refinery
-2025-06-15,missile,Oil terminal,Kharg Island,6,Strikes near Kharg Island oil terminal
-2025-06-15,missile,Nuclear facility,Fordow,7,US/Israeli strikes on Fordow enrichment plant
-2025-06-16,missile,Gas processing,South Pars,8,Continued strikes on South Pars gas field
-2025-06-17,missile,Oil infrastructure,Abadan,9,Strikes on Abadan refinery complex
-2025-06-17,missile,Petrochemical,Bandar Imam,10,Attacks on Bandar Imam petrochemical facility
-2025-06-18,missile,Energy storage,Tehran,11,Strikes on fuel storage facilities in Tehran
-2025-06-18,drone,Oil field,Ahwaz,12,Drone strikes on Ahwaz oil field
-2025-06-19,missile,Nuclear site,Natanz,13,Follow-up strikes on Natanz
-2025-06-19,missile,Ballistic missile launchers,Western Iran,14,Iran launches 550+ ballistic missiles
-2025-06-20,missile,Oil infrastructure,Various,15,Tit-for-tat strikes continue
-2025-06-20,drone,Refinery,Haifa,16,Iranian drone strikes on Haifa refinery
-2025-06-21,missile,Energy infrastructure,Both sides,17,Mutual strikes on energy infrastructure
-2025-06-22,missile,B-2 bomber strike,Fordow,18,US B-2 bombers strike Fordow
-2025-06-22,missile,Natanz,Natanz,19,US strikes on Natanz
-2025-06-23,missile,Qatar base,Al Udeid,20,Iran retaliates against US base in Qatar
-2025-06-24,ceasefire,None,None,20,Ceasefire declared - conflict ends
+2026-02-28,missile,Supreme Leader compound,Tehran,1,Assassination of Ali Khamenei - war begins
+2026-02-28,missile,Nuclear facility,Isfahan,2,Strikes on Isfahan nuclear site
+2026-02-28,missile,Military bases,Karaj,3,Joint US-Israel strikes on military installations
+2026-02-28,missile,Nuclear facility,Qom,4,Strikes on Qom nuclear site
+2026-03-01,missile,Strait of Hormuz,Persian Gulf,5,Iran closes Strait of Hormuz - oil shipments blocked
+2026-03-01,drone,US bases,Kuwait,6,Iranian drone strikes on US military bases
+2026-03-01,missile,Oil terminals,Persian Gulf,7,Iran targets oil shipping terminals
+2026-03-01,missile,US bases,Bahrain,8,Strikes on Bahrain US naval base
+2026-03-01,missile,US bases,Qatar,9,Strikes on Qatar - Hamad International Airport hit
+2026-03-01,missile,US bases,UAE,10,Strikes on UAE military installations
+2026-03-02,missile,British base,Cyprus,11,Iran strikes Akrotiri military base
+2026-03-02,missile,Oil infrastructure,Saudi Arabia,12,Strikes on Saudi oil facilities
+2026-03-02,drone,Israel,Northern Israel,13,Hezbollah joins - launches rockets at Israel
+2026-03-03,missile,Qatar retaliation,Iran,14,Qatar strikes back at Iran
+2026-03-03,missile,Oil shipping,Strait of Hormuz,15,Continued disruption of oil tankers
