@@ -9,5 +9,4 @@ COPY . .
 
 EXPOSE 10000
 
-# Use gunicorn with proper worker for Dash
-CMD ["gunicorn", "-b", "0.0.0.0:10000", "app:server"]
+CMD ["gunicorn", "-b", "0.0.0.0:10000", "app:app"]
