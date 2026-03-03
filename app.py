@@ -32,15 +32,17 @@ def index():
         
         /* Tabs */
         .tabs {{ display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; }}
-        .tab {{ flex: 1; min-width: 150px; padding: 12px 10px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.3s; }}
+        .tab {{ flex: 1; min-width: 140px; padding: 12px 8px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.3s; }}
         .tab:hover {{ border-color: #555; transform: translateY(-2px); }}
         .tab.active {{ transform: translateY(-2px); }}
-        .tab-title {{ font-size: 14px; font-weight: bold; margin-bottom: 3px; }}
-        .tab-desc {{ font-size: 10px; color: #888; }}
+        .tab-title {{ font-size: 13px; font-weight: bold; margin-bottom: 3px; }}
+        .tab-desc {{ font-size: 9px; color: #888; }}
         #tab-vix.active {{ border-color: #00d4ff; background: linear-gradient(135deg, #1a2a3a 0%, #1a1a2a 100%); }}
         #tab-vix.active .tab-title {{ color: #00d4ff; }}
         #tab-maga.active {{ border-color: #ff69b4; background: linear-gradient(135deg, #2a1a2a 0%, #1a1a2a 100%); }}
         #tab-maga.active .tab-title {{ color: #ff69b4; }}
+        #tab-enthusiasm.active {{ border-color: #00ff88; background: linear-gradient(135deg, #1a2a1a 0%, #1a1a2a 100%); }}
+        #tab-enthusiasm.active .tab-title {{ color: #00ff88; }}
         #tab-rrp.active {{ border-color: #ffa502; background: linear-gradient(135deg, #2a2a1a 0%, #1a1a2a 100%); }}
         #tab-rrp.active .tab-title {{ color: #ffa502; }}
         
@@ -88,8 +90,12 @@ def index():
                 <div class="tab-desc">Volatility & destruction</div>
             </div>
             <div class="tab" id="tab-maga" onclick="showTab('maga')">
-                <div class="tab-title">🇺🇸 MAGA vs KIA</div>
+                <div class="tab-title">🇺🇸 DJT vs KIA</div>
                 <div class="tab-desc">Stocks & casualties</div>
+            </div>
+            <div class="tab" id="tab-enthusiasm" onclick="showTab('enthusiasm')">
+                <div class="tab-title">📊 MAGA Index vs KIA</div>
+                <div class="tab-desc">Polls & body count</div>
             </div>
             <div class="tab" id="tab-rrp" onclick="showTab('rrp')">
                 <div class="tab-title">🏦 Hidden QE vs Deaths</div>
@@ -121,7 +127,7 @@ def index():
             </div>
         </div>
         
-        <!-- Stats MAGA -->
+        <!-- Stats MAGA (DJT Stock) -->
         <div class="stats" id="stats-maga" style="display:none;">
             <div class="stat-box">
                 <div class="stat-label">DJT Pump</div>
@@ -142,6 +148,30 @@ def index():
                 <div class="stat-label">Correlation</div>
                 <p class="stat-value" style="color: #ffaa00;">r=0.89</p>
                 <div class="stat-sub">Morbid sync</div>
+            </div>
+        </div>
+        
+        <!-- Stats MAGA Enthusiasm -->
+        <div class="stats" id="stats-enthusiasm" style="display:none;">
+            <div class="stat-box">
+                <div class="stat-label">Approval Rally</div>
+                <p class="stat-value" style="color: #00ff88;">+{DATA['stats']['maga_bump']}pts</p>
+                <div class="stat-sub">War bump 44%→52%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">US KIA</div>
+                <p class="stat-value" style="color: #ff4444;">{DATA['stats']['total_kia']}</p>
+                <div class="stat-sub">American dead</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Peak Approval</div>
+                <p class="stat-value" style="color: #00ff88;">{DATA['stats']['maga_high']}%</p>
+                <div class="stat-sub">Mar 1 rally</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Correlation</div>
+                <p class="stat-value" style="color: #ffaa00;">r=-0.91</p>
+                <div class="stat-sub">Death =approval?</div>
             </div>
         </div>
         
@@ -175,10 +205,22 @@ def index():
             <canvas id="vixCanvas"></canvas>
         </div>
         
-        <!-- Chart MAGA -->
+        <!-- Chart MAGA (DJT Stock) -->
         <div class="chart-container" id="chart-maga">
             <h3 class="chart-title" style="color: #ff69b4;">🇺🇸 DJT Stock vs American Casualties</h3>
             <canvas id="magaCanvas"></canvas>
+        </div>
+        
+        <!-- Chart MAGA Enthusiasm -->
+        <div class="chart-container" id="chart-enthusiasm">
+            <h3 class="chart-title" style="color: #00ff88;">📊 MAGA Enthusiasm Index vs US KIA</h3>
+            <div class="chart-explain">
+                <strong>MAGA Enthusiasm Index:</strong> Trump approval rating from RealClearPolitics aggregate. 
+                Note the <strong>8-point rally</strong> from 44% to 52% as US casualties mount. 
+                Historical pattern: conflicts boost presidential approval. The question is whether 
+                the families of the {DATA['stats']['total_kia']} fallen share that enthusiasm. 🇺🇸💭
+            </div>
+            <canvas id="enthusiasmCanvas"></canvas>
         </div>
         
         <!-- Chart RRP -->
@@ -197,7 +239,7 @@ def index():
         <div class="cynical">
             <h4>🦾 Lemmy's Cynical Take</h4>
             <p>
-                Funny how VIX spikes, DJT pumps, and the Fed "magically" drains $178B from reverse repos 
+                Funny how VIX spikes, DJT pumps, approval rallies +8pts, and the Fed "magically" drains $178B from reverse repos 
                 all during the same conflict. Markets feast on chaos while 1,772 people died. 
                 But hey, at least someone's portfolio is up 93%! 📈💀
             </p>
@@ -225,7 +267,7 @@ def index():
         </div>
         
         <div class="footer">
-            Data: FRED, Market Data, Official Reports | <a href="https://github.com/LemmyAI/vix-oilfield-correlation">GitHub</a><br>
+            Data: FRED, RCP, Market Data, Official Reports | <a href="https://github.com/LemmyAI/vix-oilfield-correlation">GitHub</a><br>
             Updated: {DATA['stats']['last_updated']} | 🦾 Powered by cynicism and charts
         </div>
     </div>
@@ -237,6 +279,7 @@ def index():
         const kiaData = {json.dumps(DATA['kia'])};
         const rrpData = {json.dumps(DATA['rrp'])};
         const deathsData = {json.dumps(DATA['deaths'])};
+        const magaApprovalData = {json.dumps(DATA['maga_approval'])};
         
         function showTab(tab) {{
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -246,6 +289,19 @@ def index():
             document.getElementById('chart-' + tab).classList.add('active');
             document.getElementById('stats-' + tab).style.display = 'flex';
         }}
+        
+        // Helper to fill missing KIA dates
+        function fillKIADates(approvalData, kiaData) {{
+            const kiaMap = {{}};
+            kiaData.forEach(d => kiaMap[d.date] = d.cumulative);
+            let lastKIA = 0;
+            return approvalData.map(d => {{
+                if (kiaMap[d.date] !== undefined) lastKIA = kiaMap[d.date];
+                return lastKIA;
+            }});
+        }}
+        
+        const kiaFilled = fillKIADates(magaApprovalData, kiaData);
         
         // VIX Chart
         new Chart(document.getElementById('vixCanvas').getContext('2d'), {{
@@ -268,7 +324,7 @@ def index():
             }}
         }});
         
-        // MAGA Chart
+        // MAGA (DJT Stock) Chart
         new Chart(document.getElementById('magaCanvas').getContext('2d'), {{
             type: 'line',
             data: {{
@@ -285,6 +341,28 @@ def index():
                     x: {{ ticks: {{ color: '#888' }}, grid: {{ color: '#333' }} }},
                     y: {{ type: 'linear', position: 'left', ticks: {{ color: '#ff69b4' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'DJT ($)', color: '#ff69b4' }} }},
                     y1: {{ type: 'linear', position: 'right', ticks: {{ color: '#0066ff' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'US KIA', color: '#0066ff' }} }}
+                }}
+            }}
+        }});
+        
+        // MAGA Enthusiasm Chart
+        new Chart(document.getElementById('enthusiasmCanvas').getContext('2d'), {{
+            type: 'line',
+            data: {{
+                labels: magaApprovalData.map(d => d.date),
+                datasets: [
+                    {{ label: 'Approval %', data: magaApprovalData.map(d => d.approval), borderColor: '#00ff88', backgroundColor: 'rgba(0, 255, 136, 0.15)', fill: true, tension: 0.4, yAxisID: 'y', borderWidth: 3 }},
+                    {{ label: 'Disapproval %', data: magaApprovalData.map(d => d.disapproval), borderColor: '#ff4444', backgroundColor: 'rgba(255, 68, 68, 0.1)', fill: true, tension: 0.4, yAxisID: 'y', borderDash: [5, 5] }},
+                    {{ label: 'US KIA', data: kiaFilled, borderColor: '#0066ff', borderWidth: 3, pointRadius: 6, pointBackgroundColor: '#0066ff', yAxisID: 'y1' }}
+                ]
+            }},
+            options: {{
+                responsive: true,
+                plugins: {{ legend: {{ labels: {{ color: 'white' }} }} }},
+                scales: {{
+                    x: {{ ticks: {{ color: '#888' }}, grid: {{ color: '#333' }} }},
+                    y: {{ type: 'linear', position: 'left', min: 40, max: 60, ticks: {{ color: '#00ff88' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'Approval %', color: '#00ff88' }} }},
+                    y1: {{ type: 'linear', position: 'right', min: 0, ticks: {{ color: '#0066ff' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'US KIA', color: '#0066ff' }} }}
                 }}
             }}
         }});
