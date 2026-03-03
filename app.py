@@ -83,7 +83,7 @@ def index():
         .section {{ background: rgba(26, 26, 26, 0.8); border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid #333; }}
         .section h3 {{ color: #ffa502; margin-top: 0; font-size: 14px; }}
         .timeline-item {{ margin-bottom: 10px; padding-left: 20px; position: relative; }}
-        .timeline-item::before {{ content: "⚫"; position: absolute; left: 0; font-size: 8px; }}
+        .timeline-item::before {{ content: "X"; position: absolute; left: 0; font-size: 8px; color: #666; }}
         .timeline-date {{ font-size: 13px; font-weight: bold; }}
         
         .cynical {{ background: linear-gradient(135deg, #2a1a1a 0%, #1a1a2a 100%); border-radius: 10px; padding: 15px; margin: 15px 0; border-left: 3px solid #ff6b6b; }}
@@ -103,15 +103,15 @@ def index():
         <div class="tabs">
             <div class="tab active" id="tab-vix" onclick="showTab('vix')">
                 <div class="tab-title">📈 VIX vs Attacks</div>
-                <div class="tab-desc">Volatility & destruction</div>
+                <div class="tab-desc">Volatility and destruction</div>
             </div>
             <div class="tab" id="tab-maga" onclick="showTab('maga')">
                 <div class="tab-title">🇺🇸 MAGA vs KIA</div>
-                <div class="tab-desc">Stocks & casualties</div>
+                <div class="tab-desc">Stocks and casualties</div>
             </div>
             <div class="tab" id="tab-rrp" onclick="showTab('rrp')">
                 <div class="tab-title">🏦 Hidden QE vs Deaths</div>
-                <div class="tab-desc">Fed magic & mortality</div>
+                <div class="tab-desc">Fed magic and mortality</div>
             </div>
         </div>
         
@@ -203,7 +203,7 @@ def index():
             <div class="sources">
                 <div class="sources-title">📚 Data Sources</div>
                 <div class="sources-list">
-                    <strong>DJT Stock:</strong> Trump Media & Technology Group (NASDAQ: DJT) - Yahoo Finance, MarketWatch |
+                    <strong>DJT Stock:</strong> Trump Media and Technology Group (NASDAQ: DJT) - Yahoo Finance, MarketWatch |
                     <strong>US Casualties:</strong> US Department of Defense briefings, Reuters, AP News
                 </div>
             </div>
@@ -212,9 +212,9 @@ def index():
         <div class="chart-container" id="chart-rrp">
             <h3 class="chart-title" style="color: #ffa502;">🏦 Hidden QE vs Conflict Deaths</h3>
             <div class="chart-explain">
-                <strong>What is RRP?</strong> The Fed's Reverse Repo facility is where banks park excess cash overnight. 
+                <strong>What is RRP?</strong> The Fed Reverse Repo facility is where banks park excess cash overnight. 
                 When RRP drops <strong>${DATA['stats']['rrp_drop']:.0f} BILLION</strong> in days, that cash floods into markets - covert liquidity injection 
-                without official QE announcement. They call it "liquidity management." We call it <strong>Hidden QE</strong>.
+                without official QE announcement. They call it liquidity management. We call it <strong>Hidden QE</strong>.
             </div>
             <canvas id="rrpCanvas"></canvas>
             <div class="sources">
@@ -238,19 +238,19 @@ def index():
         <div class="section">
             <h3>📅 War Timeline (Feb 28 - Mar 3, 2026)</h3>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #ff0000;">⚫ Feb 28</span>
+                <span class="timeline-date" style="color: #ff0000;">Feb 28</span>
                 <span style="color: #aaa;">War starts - Khamenei assassinated, missiles fly, RRP drain begins</span>
             </div>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #ff6600;">⚫ Mar 1</span>
+                <span class="timeline-date" style="color: #ff6600;">Mar 1</span>
                 <span style="color: #aaa;">Hormuz CLOSED - DJT hits ${DATA['stats']['djt_max']:.2f}, RRP crashes to ${DATA['stats']['rrp_min']:.0f}B</span>
             </div>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #ffaa00;">⚫ Mar 2</span>
+                <span class="timeline-date" style="color: #ffaa00;">mar 2</span>
                 <span style="color: #aaa;">Hezbollah joins - 1,544 total deaths</span>
             </div>
             <div class="timeline-item">
-                <span class="timeline-date" style="color: #00ffff;">⚫ Mar 3</span>
+                <span class="timeline-date" style="color: #00ffff;">Mar 3</span>
                 <span style="color: #aaa;">Qatar strikes back - {DATA['stats']['total_deaths']:,} dead total</span>
             </div>
         </div>
@@ -263,7 +263,6 @@ def index():
     
     <script>
         const dates = {json.dumps(DATA['dates'])};
-        const warStartIdx = {DATA['war_start_idx']};
         const vixData = {json.dumps(DATA['vix'])};
         const djtData = {json.dumps(DATA['djt'])};
         const attacksData = {json.dumps(DATA['attacks'])};
@@ -337,7 +336,7 @@ def index():
                 plugins: {{ legend: {{ labels: {{ color: 'white' }} }} }},
                 scales: {{
                     x: {{ ticks: {{ color: '#888', maxRotation: 45 }}, grid: {{ color: '#333' }} }},
-                    y: {{ type: 'linear', position: 'left', ticks: {{ color: '#ffa502' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'RRP ($B)', color: #'ffa502' }} }},
+                    y: {{ type: 'linear', position: 'left', ticks: {{ color: '#ffa502' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'RRP ($B)', color: '#ffa502' }} }},
                     y1: {{ type: 'linear', position: 'right', ticks: {{ color: '#ff6b6b' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'Deaths', color: '#ff6b6b' }} }}
                 }}
             }}
