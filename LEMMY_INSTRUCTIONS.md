@@ -254,3 +254,57 @@ All explanations should:
 2. Highlight key data points
 3. Explain the correlation value
 4. Add context about why the relationship exists (or doesn't)
+
+---
+
+## Automated Daily Updates
+
+A cron job is configured to run at **14:00 Swedish time (Europe/Stockholm) daily** to:
+1. Fetch automated data (VIX from FRED, DJT from Yahoo Finance)
+2. Run the data pipeline (`scripts/parse_data.py`)
+3. Commit and push changes
+4. Trigger auto-deploy on Render
+
+### Cron Job Details
+
+- **Job ID**: `iran-wars-dashboard-update`
+- **Schedule**: `0 14 * * *` (14:00 Europe/Stockholm daily)
+- **Location**: `~/.openclaw/cron/jobs.json`
+- **Delivery**: Telegram LemmySpace topic:387 (Financial Reports thread)
+
+### Manual vs Automated Data
+
+| Data Source | Automated? | How to Update |
+|-------------|------------|---------------|
+| VIX | ✅ Yes | FRED API (requires `FRED_API_KEY` env var) |
+| DJT Stock | ✅ Yes | Yahoo Finance (requires `yfinance` package) |
+| Energy Attacks | ❌ Manual | Edit `data/oilfield_attacks.csv` |
+| US Casualties | ❌ Manual | Edit `data/us_casualties.csv` |
+| Conflict Deaths | ❌ Manual | Edit `data/conflict_deaths.csv` |
+| Approval Ratings | ❌ Manual | Edit `data/approval_ratings.csv` |
+| RRP Operations | ❌ Manual | Edit `data/rrp_operations.csv` |
+
+### Setup Environment (One-time)
+
+```bash
+# Install yfinance for stock data
+pip install yfinance --user
+
+# Set FRED API key (get free key at https://fredaccount.stlouisfed.org/apikeys)
+echo 'FRED_API_KEY=your_key_here' >> ~/projects/vix-oilfield-correlation/.env
+```
+
+### Manual Data Update
+
+To manually update data:
+
+```bash
+cd ~/projects/vix-oilfield-correlation
+
+# Edit CSV files in data/ directory
+# Then run pipeline:
+python3 scripts/parse_data.py
+
+# Review output, then commit:
+git add . && git commit -m "Update data" && git push
+```
