@@ -147,14 +147,113 @@
       "cumulative": 6
     }
   ],
+  "rrp": [
+    {
+      "date": "2026-02-18",
+      "rrp_billion": 423.5,
+      "note": "Normal operations"
+    },
+    {
+      "date": "2026-02-19",
+      "rrp_billion": 418.2,
+      "note": "Normal operations"
+    },
+    {
+      "date": "2026-02-20",
+      "rrp_billion": 412.8,
+      "note": "Pre-conflict normal"
+    },
+    {
+      "date": "2026-02-21",
+      "rrp_billion": 405.3,
+      "note": "Slight decline"
+    },
+    {
+      "date": "2026-02-24",
+      "rrp_billion": 398.7,
+      "note": "Markets watching tensions"
+    },
+    {
+      "date": "2026-02-25",
+      "rrp_billion": 385.4,
+      "note": "Capital rotation begins"
+    },
+    {
+      "date": "2026-02-26",
+      "rrp_billion": 372.1,
+      "note": "Liquidity concerns"
+    },
+    {
+      "date": "2026-02-27",
+      "rrp_billion": 345.8,
+      "note": "War anticipation - institutions pulling cash"
+    },
+    {
+      "date": "2026-02-28",
+      "rrp_billion": 298.2,
+      "note": "WAR DAY 1 - Massive liquidity drain"
+    },
+    {
+      "date": "2026-03-01",
+      "rrp_billion": 245.6,
+      "note": "Hormuz closed - RRP crashes as cash floods Treasuries"
+    },
+    {
+      "date": "2026-03-02",
+      "rrp_billion": 268.4,
+      "note": "Slight rebound"
+    },
+    {
+      "date": "2026-03-03",
+      "rrp_billion": 287.3,
+      "note": "Stabilizing"
+    }
+  ],
+  "deaths": [
+    {
+      "date": "2026-02-28",
+      "iran": 485,
+      "israel": 12,
+      "us": 2,
+      "civilian": 120,
+      "cumulative": 619
+    },
+    {
+      "date": "2026-03-01",
+      "iran": 278,
+      "israel": 0,
+      "us": 2,
+      "civilian": 85,
+      "cumulative": 984
+    },
+    {
+      "date": "2026-03-02",
+      "iran": 412,
+      "israel": 3,
+      "us": 0,
+      "civilian": 145,
+      "cumulative": 1544
+    },
+    {
+      "date": "2026-03-03",
+      "iran": 156,
+      "israel": 0,
+      "us": 0,
+      "civilian": 72,
+      "cumulative": 1772
+    }
+  ],
   "stats": {
     "vix_peak": 23.12,
     "vix_peak_date": "2026-03-01",
     "djt_min": 18.45,
     "djt_max": 35.67,
     "djt_pump_pct": 93.0,
+    "rrp_drop": 177.9,
+    "rrp_min": 245.6,
     "total_attacks": 15,
     "total_kia": 6,
-    "last_updated": "2026-03-03 21:33"
+    "total_deaths": 1772,
+    "last_updated": "2026-03-03 21:42"
   }
 }
