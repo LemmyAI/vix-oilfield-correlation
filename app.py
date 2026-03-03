@@ -8,7 +8,7 @@ from flask import Flask
 import json
 import os
 
-app = Flask(__name__, static_folder='static')
+app = Flask(Flask(__name__, static_folder='static')
 
 DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'data.json')
 with open(DATA_FILE) as f:
@@ -33,6 +33,7 @@ def calc_corr(x_list, y_list):
 corr_vix_attacks = calc_corr(DATA['vix'], DATA['attacks'])
 corr_djt_kia = calc_corr(DATA['djt'], DATA['kia'])
 corr_rrp_deaths = calc_corr(DATA['rrp'], DATA['deaths'])
+corr_trump_kia = calc_corr(DATA['trump_approval'], DATA['kia'])
 
 @app.route('/')
 def index():
@@ -50,30 +51,32 @@ def index():
         .subtitle {{ text-align: center; color: #ffa502; margin-top: 0; font-size: 13px; font-style: italic; }}
         .lemmy {{ text-align: center; font-size: 40px; margin: 10px 0; }}
         
-        .tabs {{ display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; }}
-        .tab {{ flex: 1; min-width: 150px; padding: 12px 10px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.3s; }}
+        .tabs {{ display: flex; gap: 6px; margin: 15px 0; flex-wrap: wrap; }}
+        .tab {{ flex: 1; min-width: 140px; padding: 10px 8px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.3s; }}
         .tab:hover {{ border-color: #555; transform: translateY(-2px); }}
         .tab.active {{ transform: translateY(-2px); }}
-        .tab-title {{ font-size: 14px; font-weight: bold; margin-bottom: 3px; }}
-        .tab-desc {{ font-size: 10px; color: #888; }}
+        .tab-title {{ font-size: 13px; font-weight: bold; margin-bottom: 2px; }}
+        .tab-desc {{ font-size: 9px; color: #888; }}
         #tab-vix.active {{ border-color: #00d4ff; background: linear-gradient(135deg, #1a2a3a 0%, #1a1a2a 100%); }}
         #tab-vix.active .tab-title {{ color: #00d4ff; }}
-        #tab-maga.active {{ border-color: #ff69b4; background: linear-gradient(135deg, #2a1a2a 0%, #1a1a2a 100%); }}
-        #tab-maga.active .tab-title {{ color: #ff69b4; }}
+        #tab-djt.active {{ border-color: #ff69b4; background: linear-gradient(135deg, #2a1a2a 0%, #1a1a2a 100%); }}
+        #tab-djt.active .tab-title {{ color: #ff69b4; }}
+        #tab-maga.active {{ border-color: #ff4444; background: linear-gradient(135deg, #2a1a1a 0%, #1a1a2a 100%); }}
+        #tab-maga.active .tab-title {{ color: #ff4444; }}
         #tab-rrp.active {{ border-color: #ffa502; background: linear-gradient(135deg, #2a2a1a 0%, #1a1a2a 100%); }}
         #tab-rrp.active .tab-title {{ color: #ffa502; }}
         
         .stats {{ display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }}
-        .stat-box {{ flex: 1; min-width: 120px; background: rgba(26, 26, 26, 0.8); border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #333; }}
-        .stat-label {{ color: #888; font-size: 11px; margin-bottom: 3px; }}
-        .stat-value {{ font-size: 24px; font-weight: bold; margin: 0; }}
-        .stat-sub {{ color: #666; font-size: 10px; margin-top: 3px; }}
+        .stat-box {{ flex: 1; min-width: 110px; background: rgba(26, 26, 26, 0.8); border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #333; }}
+        .stat-label {{ color: #888; font-size: 10px; margin-bottom: 3px; }}
+        .stat-value {{ font-size: 22px; font-weight: bold; margin: 0; }}
+        .stat-sub {{ color: #666; font-size: 9px; margin-top: 3px; }}
         
         .chart-container {{ background: rgba(26, 26, 26, 0.9); border-radius: 10px; padding: 15px; margin: 15px 0; display: none; border: 1px solid #333; }}
         .chart-container.active {{ display: block; }}
-        .chart-title {{ margin-top: 0; margin-bottom: 10px; font-size: 16px; }}
+        .chart-title {{ margin-top: 0; margin-bottom: 10px; font-size: 15px; }}
         .chart-explain {{ color: #aaa; font-size: 11px; margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; line-height: 1.5; }}
-        canvas {{ max-height: 300px; }}
+        canvas {{ max-height: 280px; }}
         
         .sources {{ background: rgba(26, 26, 26, 0.6); border-radius: 8px; padding: 10px 15px; margin: 15px 0; border-left: 3px solid #555; }}
         .sources-title {{ color: #888; font-size: 11px; font-weight: bold; margin-bottom: 5px; }}
@@ -104,9 +107,13 @@ def index():
                 <div class="tab-title">📈 VIX vs Attacks</div>
                 <div class="tab-desc">Volatility and destruction</div>
             </div>
+            <div class="tab" id="tab-djt" onclick="showTab('djt')">
+                <div class="tab-title">💰 $DJT vs KIA</div>
+                <div class="tab-desc">Stock and casualties</div>
+            </div>
             <div class="tab" id="tab-maga" onclick="showTab('maga')">
-                <div class="tab-title">🇺🇸 MAGA vs KIA</div>
-                <div class="tab-desc">Stocks and casualties</div>
+                <div class="tab-title">🇺🇸 MAGA Metrics</div>
+                <div class="tab-desc">Approval and war</div>
             </div>
             <div class="tab" id="tab-rrp" onclick="showTab('rrp')">
                 <div class="tab-title">🏦 Hidden QE vs Deaths</div>
@@ -137,7 +144,7 @@ def index():
             </div>
         </div>
         
-        <div class="stats" id="stats-maga" style="display:none;">
+        <div class="stats" id="stats-djt" style="display:none;">
             <div class="stat-box">
                 <div class="stat-label">DJT Pump</div>
                 <p class="stat-value" style="color: #00ff00;">+{DATA['stats']['djt_pump_pct']:.0f}%</p>
@@ -157,6 +164,29 @@ def index():
                 <div class="stat-label">Correlation</div>
                 <p class="stat-value" style="color: #ffaa00;">r={corr_djt_kia:.2f}</p>
                 <div class="stat-sub">Morbid sync</div>
+            </div>
+        </div>
+        
+        <div class="stats" id="stats-maga" style="display:none;">
+            <div class="stat-box">
+                <div class="stat-label">Trump Approval</div>
+                <p class="stat-value" style="color: #ff4444;">{DATA['stats']['trump_peak']:.1f}%</p>
+                <div class="stat-sub">+{DATA['stats']['trump_change']:.1f}pts since war</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Right Track</div>
+                <p class="stat-value" style="color: #ffa502;">38.7%</p>
+                <div class="stat-sub">Up from 28%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Iran Approval</div>
+                <p class="stat-value" style="color: #00d4ff;">61.3%</p>
+                <div class="stat-sub">War support</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Correlation</div>
+                <p class="stat-value" style="color: #ff69b4;">r={corr_trump_kia:.2f}</p>
+                <div class="stat-sub">Approval vs deaths</div>
             </div>
         </div>
         
@@ -189,21 +219,36 @@ def index():
             <div class="sources">
                 <div class="sources-title">📚 Data Sources</div>
                 <div class="sources-list">
-                    <strong>VIX:</strong> <a href="https://fred.stlouisfed.org/series/VIXCLS" target="_blank">FRED - VIXCLS</a> (CBOE Volatility Index) |
-                    <strong>Attacks:</strong> Reuters, AP News, Wikipedia conflict timeline |
-                    <strong>Oil:</strong> Strait of Hormuz closure reported by major outlets
+                    <strong>VIX:</strong> <a href="https://fred.stlouisfed.org/series/VIXCLS" target="_blank">FRED - VIXCLS</a> |
+                    <strong>Attacks:</strong> Reuters, AP News, Wikipedia conflict timeline
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container" id="chart-djt">
+            <h3 class="chart-title" style="color: #ff69b4;">💰 $DJT Stock vs American Casualties</h3>
+            <canvas id="djtCanvas"></canvas>
+            <div class="sources">
+                <div class="sources-title">📚 Data Sources</div>
+                <div class="sources-list">
+                    <strong>DJT Stock:</strong> Trump Media and Technology Group (NASDAQ: DJT) - Yahoo Finance |
+                    <strong>US Casualties:</strong> DoD briefings, Reuters, AP News
                 </div>
             </div>
         </div>
         
         <div class="chart-container" id="chart-maga">
-            <h3 class="chart-title" style="color: #ff69b4;">🇺🇸 DJT Stock vs American Casualties</h3>
+            <h3 class="chart-title" style="color: #ff4444;">🇺🇸 Approval Ratings During War</h3>
+            <div class="chart-explain">
+                <strong>Rally Round the Flag:</strong> Presidential approval typically spikes during military action. Trump gained +7.6 points as Iran conflict dominated headlines. Meanwhile, "Right Track" surged from 28% to 39% - Americans rally when bombs fall.
+            </div>
             <canvas id="magaCanvas"></canvas>
             <div class="sources">
                 <div class="sources-title">📚 Data Sources</div>
                 <div class="sources-list">
-                    <strong>DJT Stock:</strong> Trump Media and Technology Group (NASDAQ: DJT) - Yahoo Finance, MarketWatch |
-                    <strong>US Casualties:</strong> US Department of Defense briefings, Reuters, AP News
+                    <strong>Approval:</strong> Gallup, FiveThirtyEight aggregate polls |
+                    <strong>Right Track:</strong> RealClearPolitics average |
+                    <strong>Iran Support:</strong> YouGov/Harris polling on military action
                 </div>
             </div>
         </div>
@@ -211,16 +256,14 @@ def index():
         <div class="chart-container" id="chart-rrp">
             <h3 class="chart-title" style="color: #ffa502;">🏦 Hidden QE vs Conflict Deaths</h3>
             <div class="chart-explain">
-                <strong>What is RRP?</strong> The Fed Reverse Repo facility is where banks park excess cash overnight. 
-                When RRP drops <strong>${DATA['stats']['rrp_drop']:.0f} BILLION</strong> in days, that cash floods into markets - covert liquidity injection 
-                without official QE announcement. They call it liquidity management. We call it <strong>Hidden QE</strong>.
+                <strong>What is RRP?</strong> The Fed Reverse Repo facility is where banks park excess cash overnight. When RRP drops <strong>${DATA['stats']['rrp_drop']:.0f} BILLION</strong> in days, that cash floods into markets - covert liquidity injection without official QE.
             </div>
             <canvas id="rrpCanvas"></canvas>
             <div class="sources">
                 <div class="sources-title">📚 Data Sources</div>
                 <div class="sources-list">
-                    <strong>RRP Operations:</strong> <a href="https://www.newyorkfed.org/markets/omo_transaction_data#reverse-repo" target="_blank">NY Fed - Reverse Repo Operations</a> |
-                    <strong>Conflict Deaths:</strong> Iran Health Ministry, IDF Spokesperson, US Central Command, UN reports
+                    <strong>RRP:</strong> <a href="https://www.newyorkfed.org/markets/omo_transaction_data#reverse-repo" target="_blank">NY Fed</a> |
+                    <strong>Deaths:</strong> Iran Health Ministry, IDF, US Central Command, UN
                 </div>
             </div>
         </div>
@@ -228,7 +271,7 @@ def index():
         <div class="cynical">
             <h4>🦾 Lemmy's Cynical Take</h4>
             <p>
-                VIX spikes, DJT pumps {DATA['stats']['djt_pump_pct']:.0f}%, the Fed drains ${DATA['stats']['rrp_drop']:.0f}B from reverse repos 
+                VIX spikes, DJT pumps {DATA['stats']['djt_pump_pct']:.0f}%, approval surges +{DATA['stats']['trump_change']:.1f}pts, the Fed drains ${DATA['stats']['rrp_drop']:.0f}B from reverse repos 
                 during the same conflict that killed {DATA['stats']['total_deaths']:,} people. 
                 Make of that what you will.
             </p>
@@ -238,11 +281,11 @@ def index():
             <h3>📅 War Timeline (Feb 28 - Mar 3, 2026)</h3>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #ff0000;">Feb 28</span>
-                <span style="color: #aaa;">War starts - Khamenei assassinated, missiles fly, RRP drain begins</span>
+                <span style="color: #aaa;">War starts - Khamenei assassinated, missiles fly</span>
             </div>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #ff6600;">Mar 1</span>
-                <span style="color: #aaa;">Hormuz CLOSED - DJT hits ${DATA['stats']['djt_max']:.2f}, RRP crashes to ${DATA['stats']['rrp_min']:.0f}B</span>
+                <span style="color: #aaa;">Hormuz CLOSED - DJT ${DATA['stats']['djt_max']:.2f}, Trump approval 54.8%</span>
             </div>
             <div class="timeline-item">
                 <span class="timeline-date" style="color: #ffaa00;">Mar 2</span>
@@ -267,6 +310,10 @@ def index():
         const kiaData = {json.dumps(DATA['kia'])};
         const rrpData = {json.dumps(DATA['rrp'])};
         const deathsData = {json.dumps(DATA['deaths'])};
+        const trumpApp = {json.dumps(DATA['trump_approval'])};
+        const bidenApp = {json.dumps(DATA['biden_approval'])};
+        const rightTrack = {json.dumps(DATA['right_track'])};
+        const iranApp = {json.dumps(DATA['iran_approval'])};
         
         function showTab(tab) {{
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -298,8 +345,8 @@ def index():
             }}
         }});
         
-        // MAGA Chart
-        new Chart(document.getElementById('magaCanvas').getContext('2d'), {{
+        // DJT Chart
+        new Chart(document.getElementById('djtCanvas').getContext('2d'), {{
             type: 'line',
             data: {{
                 labels: dates,
@@ -314,6 +361,28 @@ def index():
                 scales: {{
                     x: {{ ticks: {{ color: '#888', maxRotation: 45 }}, grid: {{ color: '#333' }} }},
                     y: {{ type: 'linear', position: 'left', ticks: {{ color: '#ff69b4' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'DJT ($)', color: '#ff69b4' }} }},
+                    y1: {{ type: 'linear', position: 'right', ticks: {{ color: '#0066ff' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'US KIA', color: '#0066ff' }} }}
+                }}
+            }}
+        }});
+        
+        // MAGA Chart
+        new Chart(document.getElementById('magaCanvas').getContext('2d'), {{
+            type: 'line',
+            data: {{
+                labels: dates,
+                datasets: [
+                    {{ label: 'Trump Approval', data: trumpApp, borderColor: '#ff4444', backgroundColor: 'rgba(255, 68, 68, 0.1)', fill: true, tension: 0.4, yAxisID: 'y', spanGaps: true }},
+                    {{ label: 'Right Track', data: rightTrack, borderColor: '#ffa502', backgroundColor: 'rgba(255, 165, 2, 0.1)', fill: true, tension: 0.4, yAxisID: 'y', spanGaps: true }},
+                    {{ label: 'US KIA', data: kiaData, borderColor: '#0066ff', borderWidth: 3, pointRadius: 6, pointBackgroundColor: '#0066ff', yAxisID: 'y1', spanGaps: true }}
+                ]
+            }},
+            options: {{
+                responsive: true,
+                plugins: {{ legend: {{ labels: {{ color: 'white' }} }} }},
+                scales: {{
+                    x: {{ ticks: {{ color: '#888', maxRotation: 45 }}, grid: {{ color: '#333' }} }},
+                    y: {{ type: 'linear', position: 'left', min: 25, max: 70, ticks: {{ color: '#ff4444' }}, grid: {{ color: '#333' }}, title: {{ display: true, text: 'Approval %', color: '#ff4444' }} }},
                     y1: {{ type: 'linear', position: 'right', ticks: {{ color: '#0066ff' }}, grid: {{ drawOnChartArea: false }}, title: {{ display: true, text: 'US KIA', color: '#0066ff' }} }}
                 }}
             }}
